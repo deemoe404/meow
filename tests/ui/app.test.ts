@@ -62,13 +62,13 @@ describe('translator app', () => {
     expect(root.querySelector('[data-role="sample"]')?.textContent).toBe('示例');
     expect(root.querySelector('[data-role="favorite"]')?.getAttribute('aria-label')).toBe('收藏');
     expect(root.querySelector('[data-role="share"]')?.getAttribute('aria-label')).toBe('分享');
-    expect(root.querySelectorAll('svg.icon').length).toBeGreaterThanOrEqual(8);
+    expect(root.querySelectorAll('svg.icon').length).toBeGreaterThanOrEqual(7);
     expect(root.textContent).not.toContain('pets');
     expect(root.textContent).not.toContain('east');
     expect(root.textContent).not.toContain('sync');
     expect(root.textContent).not.toContain('content_copy');
     expect(root.textContent).not.toContain('auto_awesome');
-    expect(root.textContent).toContain('PURRFECT MATCH');
+    expect(root.textContent).not.toContain('PURRFECT MATCH');
     expect(root.textContent).toContain('codec');
     expect(root.textContent).not.toContain('rawLength');
     expect(root.textContent).toContain('tokenCount');
@@ -116,6 +116,8 @@ describe('translator app', () => {
     const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
 
     reverse!.click();
+    expect(root.querySelector('.feline-app')?.classList.contains('is-cat-to-human')).toBe(true);
+    expect(root.querySelector('.feline-app')?.classList.contains('is-panel-swapping')).toBe(true);
     input!.value = '！喵喵mewMEW';
     input!.dispatchEvent(new Event('input', { bubbles: true }));
     translate!.click();
