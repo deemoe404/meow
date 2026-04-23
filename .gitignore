@@ -1,0 +1,9 @@
+dist/
+node_modules/
+.coverage/
+.vite/
+coverage/
+playwright-report/
+test-results/
+*.log
+*.tsbuildinfo

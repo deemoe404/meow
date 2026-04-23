@@ -1,0 +1,10 @@
+meow meow，今天的 status 是：worker ready，wasm loaded，dict selected。
+喵嗷，能不能把 “Hello, world!” 也稳定地编码成猫语，然后再完整解码回来？
+This translator is not semantic. It is a reversible codec with a theatrical cat-language surface.
+用户会输入混合文本：今天 meeting 延后到 3:30pm，记得带 laptop 和充电器。
+ASCII punctuation stays as-is: ! ~ ? # @ / \
+Fullwidth punctuation also stays as-is: ！ ～ ， 。 ： ； （ ） 【 】
+The page should feel soft, rounded, and playful, but the protocol must stay strict.
+Some messages are tiny. Some messages are long enough to benefit from dictionary compression in the first few kilobytes.
+今天晚上记得喂猫 two times，不然它会在键盘上踩出一串 meowmeowmeow。
+不要把 U+301C 〜 和 U+FF5E ～ 混为一谈，它们不是同一个 code point。

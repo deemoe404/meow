@@ -1,0 +1,12 @@
+😺😸😹😻😼😽🙀😿😾
+猫猫发来了一串消息：喵～喵～喵！😺🍣🧶🛋️
+Symbols: © ™ ® § ¶ • … — – ← → ↑ ↓
+Math-like text: 1 + 1 = 2, 2^5 = 32, payload_len <= raw_len ? keep_zstd : keep_raw
+Markdown-ish text: **猫语翻译器**、`nya32-zh1`、[GitHub Pages](https://pages.github.com/)
+URL-like text: https://example.com/meow?lang=zh-CN&mode=upper
+Shell-ish text: git status && vite build && pnpm test
+JSON-ish text: {"codec":1,"dictId":1314470401,"ok":true}
+换行样本开始：
+第一行是猫语。
+第二行还是猫语。
+第三行有 emoji 😼 和全角 ～ 以及 ASCII ~。
