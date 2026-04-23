@@ -39,14 +39,12 @@ pnpm preview
 4. codec frame 走无 padding 的 108 进制 digit 切片
 5. digit 直接映射到固定 108-token 猫语表，输出串中的每个 token 都承载 payload
 
-codec tag 固定为：
+协议内部的 `CodecId` 与 wire tag 分开表示：UI / meta 中的 codec id 使用 `0 raw`、`1 zstd-dict`；写入 codec frame 首字节的 wire tag 固定为：
 
 ```text
 1 raw
 2 zstd-dict
 ```
-
-`nya108-zh4` 不兼容旧版 `nya58-zh3` / `nya58-zh2` / `nya58-zh1` 编码串；旧串不会作为 fallback 自动解码。
 
 ## 词表
 
