@@ -1,0 +1,165 @@
+https://example.com/
+https://example.com/meow
+https://example.com/meow/
+https://example.com/meow?text=hello
+https://example.com/meow?text=%E5%96%B5&mode=encode
+https://example.com/meow?mode=encode&lang=zh-CN&codec=zstd-dict
+https://example.com/meow?mode=decode&lang=zh-CN&codec=raw
+https://example.com/meow/share?id=cat-001&copy=true
+https://example.com/meow/share?id=cat-002&theme=soft
+https://example.com/meow#result
+https://example.com/meow#settings
+https://pages.github.com/
+https://github.com/deemoe404/meow
+https://github.com/deemoe404/meow/actions
+https://github.com/deemoe404/meow/deployments/github-pages
+http://localhost:5173/
+http://localhost:5173/?mode=encode
+http://localhost:4173/meow/?preview=1
+mailto:hello+meow@example.com
+hello.cat@example.com
+support@example.com?subject=meow%20codec
+file:///Users/sam/Projects/meow/index.html
+/Users/sam/Projects/meow
+/Users/sam/Projects/meow/src/protocol/compression.ts
+/Users/sam/Projects/meow/src/protocol/browser-compression.ts
+/Users/sam/Projects/meow/src/assets/dict_v1.bin
+/Users/sam/Projects/meow/protocol/dict_v1/samples
+C:\Users\cat\Desktop\meow.txt
+C:\Users\cat\Downloads\cat-codec.json
+./src/protocol/compression.ts
+../protocol/dict_v1/samples/06-chat-ui-url.txt
+src/assets/dict_v1.bin?url
+import dictUrl from '../assets/dict_v1.bin?url';
+const DEFAULT_COMPRESSION_LEVEL = 10;
+const READY_CODECS = ['raw', 'zstd-dict'];
+const compressed = compressUsingDict(cctx, raw, dict, level);
+if (compressed.length < raw.length) use zstd-dict;
+if (compressed.length >= raw.length) keep raw;
+codec tag 1 means raw.
+codec tag 2 means zstd-dict.
+内部 codec id 0 表示 raw。
+内部 codec id 1 表示 zstd-dict。
+wire tag 0x01 表示 raw payload。
+wire tag 0x02 表示 zstd 字典压缩 payload。
+UTF-8 原文 -> raw/zstd-dict -> codec frame -> base108 digit -> 108-token 猫语表。
+UTF-8 bytes -> zstd dict -> payload -> frame -> digit -> token.
+TextEncoder 把 JavaScript string 编码成 UTF-8。
+TextDecoder 把 UTF-8 bytes 解码回 JavaScript string。
+Web Worker 负责压缩、解压、frame 打包和 token 映射。
+主线程负责输入框、按钮、状态文案和复制结果。
+wasm 初始化成功以后，ready 状态会回到 UI。
+字典加载失败以后，错误类型是 runtime-unavailable。
+无法加载字典资源：404。
+无法加载字典资源：500。
+浏览器压缩运行时初始化失败。
+不支持的 codec tag: 3。
+不支持的 codec: 2。
+frame 太短。
+token 无法解析。
+payload 无法解码。
+wrapper 不匹配。
+CRC 校验失败。
+length mismatch。
+invalid token。
+unsupported codec。
+runtime unavailable。
+corrupted data。
+copy failed。
+copy succeeded。
+worker ready。
+worker not ready。
+wasm loaded。
+wasm loading。
+dict loaded。
+dict loading。
+zstd-dict ready。
+raw ready。
+raw / zstd-dict ready。
+encode pending。
+decode pending。
+encode complete。
+decode complete。
+encode failed。
+decode failed。
+input empty。
+output empty。
+input changed。
+output copied。
+sample loaded。
+direction switched。
+mode encode。
+mode decode。
+theme playful。
+theme compact。
+theme console。
+data-role="input"
+data-role="output"
+data-role="meta-codec"
+data-role="meta-token-count"
+data-role="runtime-status"
+data-role="copy-button"
+data-role="clear-button"
+data-role="sample-button"
+{"type":"ready","id":1}
+{"type":"encode","id":2,"text":"你好，猫猫！"}
+{"type":"decode","id":3,"cat":"喵喵咪喵喵呜"}
+{"ok":true,"codec":"zstd-dict","tokenCount":128}
+{"ok":false,"error":"runtime-unavailable"}
+{"codec":0,"name":"raw"}
+{"codec":1,"name":"zstd-dict"}
+{"wasmLoaded":true,"codecs":["raw","zstd-dict"]}
+{"mode":"encode","input":"Hello, 猫猫!","preserveUnicode":true}
+{"mode":"decode","input":"喵喵咪喵","strict":true}
+pnpm install
+pnpm test
+pnpm build
+pnpm preview
+pnpm vitest run
+pnpm exec vite build
+git status --short
+git diff --stat
+git diff -- protocol/dict_v1/samples
+python3 -m pip install --target /tmp/zstdpy zstandard
+PYTHONPATH=/tmp/zstdpy python3 scripts/train_dict_v1.py
+PYTHONPATH=/tmp/zstdpy python3 scripts/train_dict_v1.py --dict-size 49152
+python3 scripts/train_dict_v1.py --samples-dir protocol/dict_v1/samples --output src/assets/dict_v1.bin
+curl -fsSL https://downloads.tatoeba.org/exports/per_language/cmn/cmn_sentences_CC0.tsv.bz2
+bzcat cmn_sentences_CC0.tsv.bz2
+sentence_id	language	text	date
+10597783	cmn	2022/2972 新年快乐！	2021-12-31 15:06:47
+The protocol is reversible.
+The codec is not semantic.
+The browser does all encoding locally.
+The worker keeps the page responsive.
+The dictionary is a static asset.
+The payload is shorter only when zstd wins.
+Raw is kept when compression is not shorter.
+Short messages often stay raw.
+Longer mixed messages can benefit from the dictionary.
+URLs often repeat https, query, mode, lang, and codec.
+UI messages often repeat ready, loading, failed, input, output, copy, clear.
+Chinese chat messages often repeat 请、我想、可以、不要、正在、失败、成功。
+Emoji and symbols must round-trip unchanged: 😺 🧶 🍣 ✨ ✅ ❌ ⚠️。
+Fullwidth punctuation must round-trip unchanged: ！ ～ ， 。 ： ； （ ） 【 】。
+ASCII punctuation must round-trip unchanged: ! ~ ? # @ / \ & = % + - _ . : ;
+Markdown must round-trip unchanged: **bold** `code` [link](https://example.com)
+JSON must round-trip unchanged: {"ready":true,"codec":"zstd-dict"}
+Shell commands must round-trip unchanged: pnpm test && pnpm build
+Query strings must round-trip unchanged: ?mode=encode&lang=zh-CN&copy=1
+Hash fragments must round-trip unchanged: #result
+Paths must round-trip unchanged: /src/assets/dict_v1.bin
+Email-like text must round-trip unchanged: hello+cat@example.com
+猫语不是翻译语义，而是可逆编码。
+猫语 token 表固定，顺序不能随便改。
+猫语输出可以很可爱，但协议层必须严格。
+猫语结果可以复制、粘贴、分享、再解码。
+猫语输入可能带空格、换行、emoji、URL 和代码。
+猫语解码必须拒绝未知 token。
+猫语解码必须拒绝未知 codec tag。
+猫语解码必须用同一个 dict_v1。
+猫语编码必须在 zstd-dict 和 raw 之间选择更短 payload。
+猫语 UI 必须清楚显示当前 codec。
+猫语 UI 必须清楚显示 token count。
+猫语 UI 必须在运行时不可用时给出错误。
+猫语 UI 必须在复制失败时让用户手动复制。
