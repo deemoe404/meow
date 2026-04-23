@@ -52,7 +52,8 @@ describe('translator app', () => {
     await createTranslatorApp(root, createService());
 
     expect(root.querySelector('h1')?.textContent).toBe('猫语翻译器');
-    expect(root.textContent).toContain('nya58-zh3');
+    expect(root.textContent).toContain('nya108-zh4');
+    expect(root.textContent).toContain('108-token');
     expect(root.textContent).toMatch(/本地可逆编码/);
     expect(root.querySelector('#input-title')?.textContent).toBe('输入');
     expect(root.querySelector('#output-title')?.textContent).toBe('输出');

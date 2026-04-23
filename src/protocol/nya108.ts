@@ -1,7 +1,7 @@
 import {
-  base58DigitsToBytesNoPad,
-  bytesToBase58DigitsNoPad,
-} from './base58-digits';
+  baseNDigitsToBytesNoPad,
+  bytesToBaseNDigitsNoPad,
+} from './base-n-digits';
 import { packFrame, unpackFrame } from './frame';
 import {
   decodeCatToDigits,
@@ -24,7 +24,7 @@ function buildMeta(
   };
 }
 
-export function createNya58Codec(adapter: CompressionAdapter) {
+export function createNya108Codec(adapter: CompressionAdapter) {
   const textEncoder = new TextEncoder();
   const textDecoder = new TextDecoder();
   let initPromise: Promise<unknown> | null = null;
@@ -46,7 +46,7 @@ export function createNya58Codec(adapter: CompressionAdapter) {
       codec: choice.codec,
       payload: choice.payload,
     });
-    const digits = bytesToBase58DigitsNoPad(frame);
+    const digits = bytesToBaseNDigitsNoPad(frame);
 
     return {
       cat: encodeDigitsToCat(digits),
@@ -61,7 +61,7 @@ export function createNya58Codec(adapter: CompressionAdapter) {
     await ensureReady();
 
     const digits = decodeCatToDigits(cat);
-    const frameBytes = base58DigitsToBytesNoPad(digits);
+    const frameBytes = baseNDigitsToBytesNoPad(digits);
     const frame = unpackFrame(frameBytes);
     const raw = await adapter.decodePayload(frame.codec, frame.payload);
 

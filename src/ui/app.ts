@@ -37,11 +37,11 @@ export async function createTranslatorApp(
           <span class="brand-mark" aria-hidden="true">nya</span>
           <div>
             <h1 id="app-title">猫语翻译器</h1>
-            <p>本地可逆编码，把 Unicode 文本转换成 nya58-zh3 猫语串。</p>
+            <p>本地可逆编码，把 Unicode 文本转换成 nya108-zh4 猫语串。</p>
           </div>
         </div>
         <div class="runtime-cluster" aria-live="polite">
-          <span class="protocol-chip">nya58-zh3</span>
+          <span class="protocol-chip">nya108-zh4</span>
           <span class="runtime-status" data-role="status">初始化中</span>
         </div>
       </header>
@@ -100,7 +100,7 @@ export async function createTranslatorApp(
           </div>
           <details class="protocol-details">
             <summary>协议摘要</summary>
-            <p>UTF-8 原文 -> raw/zstd-dict -> codec frame -> base58 digit -> 58-token 猫语表。</p>
+            <p>UTF-8 原文 -> raw/zstd-dict -> codec frame -> base108 digit -> 108-token 猫语表。</p>
           </details>
         </section>
       </main>

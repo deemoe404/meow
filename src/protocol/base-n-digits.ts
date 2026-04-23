@@ -1,14 +1,15 @@
 import { ProtocolError } from './errors';
+import { TOKEN_TABLE } from './tokens';
 
-const BASE = 58;
+const BASE = TOKEN_TABLE.length;
 
 function ensureDigit(digit: number): void {
   if (!Number.isInteger(digit) || digit < 0 || digit >= BASE) {
-    throw new ProtocolError('digit 超出 0..57 范围。', 'invalid-input');
+    throw new ProtocolError(`digit 超出 0..${BASE - 1} 范围。`, 'invalid-input');
   }
 }
 
-export function bytesToBase58DigitsNoPad(bytes: Uint8Array): number[] {
+export function bytesToBaseNDigitsNoPad(bytes: Uint8Array): number[] {
   if (bytes.length === 0) {
     return [];
   }
@@ -38,7 +39,7 @@ export function bytesToBase58DigitsNoPad(bytes: Uint8Array): number[] {
   return Array.from({ length: leadingZeroBytes }, () => 0).concat(digits);
 }
 
-export function base58DigitsToBytesNoPad(digits: number[]): Uint8Array {
+export function baseNDigitsToBytesNoPad(digits: number[]): Uint8Array {
   if (digits.length === 0) {
     return Uint8Array.of();
   }
