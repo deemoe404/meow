@@ -159,7 +159,7 @@ export async function createTranslatorApp(
             </section>
           </div>
 
-          <img class="stitch-cat" data-role="stitch-cat" src="/stitch-cat.png" alt="Peeking cat" />
+          <img class="stitch-cat" data-role="stitch-cat" src="stitch-cat.png" alt="Peeking cat" />
           <p class="error" data-role="error" hidden></p>
           <div class="meta-row" aria-live="polite">
             <span class="runtime-status" data-role="status">初始化中</span>
