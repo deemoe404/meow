@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { bytesToBase58DigitsNoPad } from '../../src/protocol/base58-digits';
 import { createNya58Codec } from '../../src/protocol/nya58';
 import type { CompressionAdapter } from '../../src/protocol/types';
-import {
-  encodeDigitsToCat,
-} from '../../src/protocol/tokens';
 
 function createCompressionAdapter(): CompressionAdapter {
   const cache = new Map<string, Uint8Array>();
@@ -85,24 +81,15 @@ describe('nya58 codec', () => {
     expect(encoded.meta.codec).toBe(0);
   });
 
-  it('rejects old nya58-zh1 cat strings by version', async () => {
-    const codec = createNya58Codec(createCompressionAdapter());
-    const legacyFrame = Uint8Array.from([
-      0x4e, 0x59, 0x01, 0x00, 0x00, 0x02, 0x02, 0x12, 0x34, 0x56, 0x78, 0x68, 0x69,
-    ]);
-    const legacyCat = encodeDigitsToCat(bytesToBase58DigitsNoPad(legacyFrame));
+  it('uses a one-byte codec frame for short raw text', async () => {
+    const codec = createNya58Codec(createRawCompressionAdapter());
+    const encoded = await codec.encode('你好');
+    const decoded = await codec.decode(encoded.cat);
 
-    await expect(codec.decode(legacyCat)).rejects.toThrowError(/版本|version/i);
-  });
-
-  it('rejects cat strings when decoded length mismatches raw length', async () => {
-    const codec = createNya58Codec(createCompressionAdapter());
-    const mismatchedFrame = Uint8Array.from([
-      0x4e, 0x59, 0x02, 0x00, 0x05, 0x72, 0x61, 0x77, 0x21,
-    ]);
-    const tampered = encodeDigitsToCat(bytesToBase58DigitsNoPad(mismatchedFrame));
-
-    await expect(codec.decode(tampered)).rejects.toThrowError(/长度不匹配/i);
+    expect(decoded.text).toBe('你好');
+    expect(encoded.meta.codec).toBe(0);
+    expect(encoded.meta).not.toHaveProperty('rawLength');
+    expect(encoded.meta.tokenCount).toBe(9);
   });
 
   it('produces shorter output than the old nya32 encoding for fixed raw samples', async () => {

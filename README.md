@@ -1,10 +1,10 @@
 # 猫语翻译器
 
-一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya58-zh2`。
+一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya58-zh3`。
 
 ## 特性
 
-- 任意 Unicode 文本 `-> UTF-8 -> frame -> base58 digit -> 58-token 猫语`
+- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base58 digit -> 58-token 猫语`
 - `raw` 与 `zstd-dict` 双 codec，编码时自动选择更短 payload
 - 浏览器本地编解码，无服务端依赖
 - 主线程 UI + Web Worker 协议内核，避免压缩和 wasm 初始化卡住页面
@@ -29,17 +29,24 @@ pnpm preview
 
 ## 协议说明
 
-`nya58-zh2` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。
+`nya58-zh3` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。
 
 编码流程：
 
 1. 文本按原样转成 UTF-8 字节
 2. 同时尝试 `raw` 与 `zstd-dict`
-3. 打包为 `NY` frame，写入版本、codec、原文字节长度，并把剩余字节全部视为 payload
-4. frame 走无 padding 的 58 进制 digit 切片
+3. 打包为极简 codec frame：首字节是 codec tag，剩余字节全部视为 payload
+4. codec frame 走无 padding 的 58 进制 digit 切片
 5. digit 直接映射到固定 58-token 猫语表，输出串中的每个 token 都承载 payload
 
-`nya58-zh2` 不兼容旧版 `nya58-zh1` 编码串；旧串不会作为 fallback 自动解码。
+codec tag 固定为：
+
+```text
+1 raw
+2 zstd-dict
+```
+
+`nya58-zh3` 不兼容旧版 `nya58-zh2` / `nya58-zh1` 编码串；旧串不会作为 fallback 自动解码。
 
 ## 词表
 

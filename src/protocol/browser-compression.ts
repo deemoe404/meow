@@ -63,7 +63,7 @@ export function createBrowserCompressionAdapter() {
     async choosePayload(raw: Uint8Array) {
       return (await ensureAdapter()).choosePayload(raw);
     },
-    async decodePayload(codec: 0 | 1 | 2, payload: Uint8Array) {
+    async decodePayload(codec: 0 | 1, payload: Uint8Array) {
       return (await ensureAdapter()).decodePayload(codec, payload);
     },
   };

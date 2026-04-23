@@ -9,14 +9,12 @@ import type { CodecInfo, WorkerRequest, WorkerResponse } from './messages';
 const compression = createBrowserCompressionAdapter();
 const codec = createNya58Codec(compression);
 
-function codecInfo(name: 'raw' | 'zstd-dict' | 'cmix'): CodecInfo {
+function codecInfo(name: 'raw' | 'zstd-dict'): CodecInfo {
   switch (name) {
     case 'raw':
       return { id: 0, name };
     case 'zstd-dict':
       return { id: 1, name };
-    case 'cmix':
-      return { id: 2, name };
   }
 }
 

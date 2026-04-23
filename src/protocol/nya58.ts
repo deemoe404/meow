@@ -2,7 +2,6 @@ import {
   base58DigitsToBytesNoPad,
   bytesToBase58DigitsNoPad,
 } from './base58-digits';
-import { ProtocolError } from './errors';
 import { packFrame, unpackFrame } from './frame';
 import {
   decodeCatToDigits,
@@ -17,12 +16,10 @@ import type {
 
 function buildMeta(
   codec: ProtocolMeta['codec'],
-  rawLength: number,
   tokenCount: number,
 ): ProtocolMeta {
   return {
     codec,
-    rawLength,
     tokenCount,
   };
 }
@@ -47,7 +44,6 @@ export function createNya58Codec(adapter: CompressionAdapter) {
     const choice = await adapter.choosePayload(raw);
     const frame = packFrame({
       codec: choice.codec,
-      rawLength: raw.length,
       payload: choice.payload,
     });
     const digits = bytesToBase58DigitsNoPad(frame);
@@ -56,7 +52,6 @@ export function createNya58Codec(adapter: CompressionAdapter) {
       cat: encodeDigitsToCat(digits),
       meta: buildMeta(
         choice.codec,
-        raw.length,
         digits.length,
       ),
     };
@@ -70,15 +65,10 @@ export function createNya58Codec(adapter: CompressionAdapter) {
     const frame = unpackFrame(frameBytes);
     const raw = await adapter.decodePayload(frame.codec, frame.payload);
 
-    if (raw.length !== frame.rawLength) {
-      throw new ProtocolError('解码后原文字节长度不匹配。', 'corrupted-data');
-    }
-
     return {
       text: textDecoder.decode(raw),
       meta: buildMeta(
         frame.codec,
-        frame.rawLength,
         digits.length,
       ),
     };

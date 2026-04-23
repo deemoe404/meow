@@ -1,6 +1,6 @@
-export type CodecId = 0 | 1 | 2;
+export type CodecId = 0 | 1;
 
-export type CodecName = 'raw' | 'zstd-dict' | 'cmix';
+export type CodecName = 'raw' | 'zstd-dict';
 
 export interface CompressionChoice {
   codec: CodecId;
@@ -23,7 +23,6 @@ export interface CompressionAdapter {
 
 export interface ProtocolMeta {
   codec: CodecId;
-  rawLength: number;
   tokenCount: number;
 }
 
@@ -39,10 +38,7 @@ export interface DecodeResult {
 
 export interface FrameInput {
   codec: CodecId;
-  rawLength: number;
   payload: Uint8Array;
 }
 
-export interface FrameData extends FrameInput {
-  version: number;
-}
+export type FrameData = FrameInput;
