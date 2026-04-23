@@ -32,6 +32,34 @@
     linear-gradient(180deg, #f8faf7 0%, var(--bg) 42%, var(--bg-alt) 100%);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101722;
+    --bg-alt: #151d28;
+    --paper: #1b2430;
+    --paper-strong: #202b38;
+    --ink: #eef4f8;
+    --ink-soft: #c7d3dc;
+    --muted: #96a7b4;
+    --sage: #abc1a5;
+    --mist: #7d91a4;
+    --mist-weak: #354554;
+    --line: rgba(203, 216, 226, 0.15);
+    --line-strong: rgba(219, 230, 237, 0.24);
+    --danger: #f09c96;
+    --shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+    --shadow-strong: 0 22px 54px rgba(0, 0, 0, 0.38);
+    --control: #d8e7f0;
+    --control-hover: #ffffff;
+    --control-soft: #263442;
+    --control-soft-hover: #324453;
+    color-scheme: dark;
+    background:
+      radial-gradient(circle at 16% 0%, rgba(125, 145, 164, 0.14), transparent 36%),
+      linear-gradient(180deg, #0d131d 0%, var(--bg) 46%, var(--bg-alt) 100%);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -433,6 +461,97 @@ textarea::selection {
 .protocol-details p,
 .brand-lockup p {
   word-break: break-word;
+}
+
+@media (prefers-color-scheme: dark) {
+  button:focus-visible,
+  textarea:focus-visible {
+    outline-color: rgba(216, 231, 240, 0.58);
+  }
+
+  .brand-mark {
+    border-color: rgba(219, 230, 237, 0.18);
+    background:
+      linear-gradient(180deg, rgba(43, 57, 70, 0.94), rgba(31, 42, 54, 0.92));
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.24);
+  }
+
+  .protocol-chip {
+    border-color: rgba(219, 230, 237, 0.2);
+    background: rgba(31, 42, 54, 0.82);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  }
+
+  .pebble-panel {
+    background:
+      linear-gradient(180deg, rgba(35, 47, 60, 0.97), rgba(27, 36, 48, 0.98));
+  }
+
+  .pebble-panel:hover {
+    border-color: rgba(219, 230, 237, 0.22);
+  }
+
+  .direction-switch {
+    border-color: rgba(219, 230, 237, 0.14);
+    background: rgba(18, 26, 36, 0.76);
+  }
+
+  .direction-switch button:hover:not(:disabled),
+  .secondary-action:hover:not(:disabled),
+  .copy-action:hover:not(:disabled) {
+    background: rgba(216, 231, 240, 0.09);
+    border-color: rgba(219, 230, 237, 0.16);
+  }
+
+  .direction-switch button[aria-pressed="true"],
+  .direction-switch button.is-active {
+    background: rgba(216, 231, 240, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(219, 230, 237, 0.1);
+  }
+
+  .primary-action {
+    background: linear-gradient(180deg, #edf6fb, #c7d9e4);
+    color: #132031;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.34);
+  }
+
+  .primary-action:hover:not(:disabled) {
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.42);
+  }
+
+  .primary-action:disabled {
+    background: linear-gradient(180deg, rgba(216, 231, 240, 0.3), rgba(216, 231, 240, 0.2));
+    color: rgba(238, 244, 248, 0.72);
+  }
+
+  textarea {
+    border-color: rgba(219, 230, 237, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  textarea[readonly] {
+    background: linear-gradient(180deg, rgba(32, 43, 56, 0.98), rgba(28, 37, 49, 0.98));
+  }
+
+  textarea::placeholder {
+    color: rgba(150, 167, 180, 0.76);
+  }
+
+  textarea::selection {
+    background: rgba(171, 193, 165, 0.28);
+  }
+
+  .protocol-strip {
+    border-color: rgba(219, 230, 237, 0.13);
+    background: rgba(24, 33, 44, 0.86);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.24);
+  }
+
+  .protocol-details {
+    border-top-color: rgba(219, 230, 237, 0.12);
+  }
 }
 
 @keyframes rise-in {
