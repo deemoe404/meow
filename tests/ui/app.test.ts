@@ -47,17 +47,26 @@ async function flush() {
 }
 
 describe('translator app', () => {
-  it('renders the core translator controls', async () => {
+  it('renders the Pebble Console translator workspace', async () => {
     const root = document.createElement('div');
     document.body.append(root);
 
     await createTranslatorApp(root, createService());
 
+    expect(root.querySelector('h1')?.textContent).toBe('猫语翻译器');
     expect(root.textContent).toContain('nya58-zh2');
-    expect(root.textContent).toContain('猫语翻译器');
-    expect(root.textContent).toContain('人话 -> 猫语');
-    expect(root.textContent).toContain('猫语 -> 人话');
-    expect(root.textContent).toContain('协议摘要');
+    expect(root.textContent).toMatch(/本地可逆编码/);
+    expect(root.querySelector('#input-title')?.textContent).toBe('输入');
+    expect(root.querySelector('#output-title')?.textContent).toBe('输出');
+    expect(root.querySelector('[data-role="translate"]')?.textContent).toBe('翻译');
+    expect(root.querySelector('[data-role="copy"]')?.textContent).toBe('复制');
+    expect(root.querySelector('[data-role="clear"]')?.textContent).toBe('清空');
+    expect(root.querySelector('[data-role="sample"]')?.textContent).toBe('示例');
+    expect(root.textContent).toContain('codec');
+    expect(root.textContent).toContain('rawLength');
+    expect(root.textContent).toContain('tokenCount');
+    expect(root.querySelector('[data-role="direction-human"]')?.textContent).toBe('人话 -> 猫语');
+    expect(root.querySelector('[data-role="direction-cat"]')?.textContent).toBe('猫语 -> 人话');
   });
 
   it('encodes human text and updates output/meta', async () => {
@@ -82,11 +91,9 @@ describe('translator app', () => {
 
     expect(encode).toHaveBeenCalledWith('你好，猫猫');
     expect(output!.value).toBe('！喵喵mewMEW');
-    expect(root.textContent).toContain('raw');
-    expect(root.textContent).toContain('rawLength');
-    expect(root.textContent).toContain('tokenCount');
-    expect(root.textContent).not.toContain('dictId');
-    expect(root.textContent).not.toContain('payloadLength');
+    expect(root.querySelector('[data-role="meta-codec"]')?.textContent).toBe('zstd-dict');
+    expect(root.querySelector('[data-role="meta-raw-length"]')?.textContent).toBe('5');
+    expect(root.querySelector('[data-role="meta-token-count"]')?.textContent).toBe('4');
   });
 
   it('switches direction before translating and does not render uppercase mode controls', async () => {
@@ -134,6 +141,41 @@ describe('translator app', () => {
     await flush();
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('！喵喵mewMEW');
+  });
+
+  it('shows short feedback after copying output', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    const service = createService({
+      async encode(text) {
+        return {
+          cat: 'encoded-cat',
+          meta: {
+            codec: 1,
+            rawLength: text.length,
+            tokenCount: 4,
+          },
+        };
+      },
+    });
+
+    await createTranslatorApp(root, service);
+
+    const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+    const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
+    const copy = root.querySelector<HTMLButtonElement>('[data-role="copy"]');
+
+    input!.value = 'hello';
+    input!.dispatchEvent(new Event('input', { bubbles: true }));
+    translate!.click();
+    await flush();
+
+    copy!.click();
+    await flush();
+
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('encoded-cat');
+    expect(copy!.textContent).toBe('已复制');
   });
 
   it('shows translated errors to the user', async () => {
