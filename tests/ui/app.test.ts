@@ -45,27 +45,33 @@ async function flush() {
 }
 
 describe('translator app', () => {
-  it('renders the Pebble Console translator workspace', async () => {
+  it('renders the feline translator workspace from the target design', async () => {
     const root = document.createElement('div');
     document.body.append(root);
 
     await createTranslatorApp(root, createService());
 
-    expect(root.querySelector('h1')?.textContent).toBe('猫语翻译器');
-    expect(root.textContent).toContain('nya108-zh4');
-    expect(root.textContent).toContain('108-token');
-    expect(root.textContent).toMatch(/本地可逆编码/);
-    expect(root.querySelector('#input-title')?.textContent).toBe('输入');
-    expect(root.querySelector('#output-title')?.textContent).toBe('输出');
-    expect(root.querySelector('[data-role="translate"]')?.textContent).toBe('翻译');
-    expect(root.querySelector('[data-role="copy"]')?.textContent).toBe('复制');
+    expect(root.querySelector('h1')?.textContent?.trim()).toBe('喵在说啥');
+    expect(root.textContent).toContain('THE FELINE CONNECTION');
+    expect(root.querySelector('[data-role="source-label"]')?.textContent).toBe('Chinese');
+    expect(root.querySelector('[data-role="target-label"]')?.textContent).toBe('Cat');
+    expect(root.querySelector('[data-role="stitch-cat"]')?.getAttribute('src')).toBe('/stitch-cat.png');
+    expect(root.querySelector('[data-role="translate"]')?.getAttribute('aria-label')).toBe('翻译');
+    expect(root.querySelector('[data-role="copy"]')?.getAttribute('aria-label')).toBe('复制');
     expect(root.querySelector('[data-role="clear"]')?.textContent).toBe('清空');
     expect(root.querySelector('[data-role="sample"]')?.textContent).toBe('示例');
+    expect(root.querySelector('[data-role="favorite"]')?.getAttribute('aria-label')).toBe('收藏');
+    expect(root.querySelector('[data-role="share"]')?.getAttribute('aria-label')).toBe('分享');
+    expect(root.querySelectorAll('svg.icon').length).toBeGreaterThanOrEqual(8);
+    expect(root.textContent).not.toContain('pets');
+    expect(root.textContent).not.toContain('east');
+    expect(root.textContent).not.toContain('sync');
+    expect(root.textContent).not.toContain('content_copy');
+    expect(root.textContent).not.toContain('auto_awesome');
+    expect(root.textContent).toContain('PURRFECT MATCH');
     expect(root.textContent).toContain('codec');
     expect(root.textContent).not.toContain('rawLength');
     expect(root.textContent).toContain('tokenCount');
-    expect(root.querySelector('[data-role="direction-human"]')?.textContent).toBe('人话 -> 猫语');
-    expect(root.querySelector('[data-role="direction-cat"]')?.textContent).toBe('猫语 -> 人话');
   });
 
   it('encodes human text and updates output/meta', async () => {
@@ -106,7 +112,7 @@ describe('translator app', () => {
 
     const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
     const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
-    const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-cat"]');
+    const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
     const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
 
     reverse!.click();
@@ -175,7 +181,8 @@ describe('translator app', () => {
     await flush();
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('encoded-cat');
-    expect(copy!.textContent).toBe('已复制');
+    expect(copy!.getAttribute('aria-label')).toBe('已复制');
+    expect(copy!.textContent).not.toContain('content_copy');
   });
 
   it('shows translated errors to the user', async () => {

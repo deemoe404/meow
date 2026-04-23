@@ -26,84 +26,156 @@ function buttonPressed(button: HTMLButtonElement, active: boolean): void {
   button.classList.toggle('is-active', active);
 }
 
+type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share' | 'spark';
+
+function icon(name: IconName): string {
+  const icons: Record<IconName, string> = {
+    paw: `
+      <svg class="icon icon--paw" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M7.1 10.7c-1.35 0-2.45-1.32-2.45-2.95S5.75 4.8 7.1 4.8s2.45 1.32 2.45 2.95-1.1 2.95-2.45 2.95Z" />
+        <path d="M16.9 10.7c-1.35 0-2.45-1.32-2.45-2.95s1.1-2.95 2.45-2.95 2.45 1.32 2.45 2.95-1.1 2.95-2.45 2.95Z" />
+        <path d="M11.95 8.9c-1.35 0-2.45-1.42-2.45-3.17s1.1-3.17 2.45-3.17 2.45 1.42 2.45 3.17-1.1 3.17-2.45 3.17Z" />
+        <path d="M5.05 15.05c-1.04 0-1.9-1.05-1.9-2.34s.86-2.34 1.9-2.34 1.9 1.05 1.9 2.34-.86 2.34-1.9 2.34Z" />
+        <path d="M18.95 15.05c-1.04 0-1.9-1.05-1.9-2.34s.86-2.34 1.9-2.34 1.9 1.05 1.9 2.34-.86 2.34-1.9 2.34Z" />
+        <path d="M12 11.2c2.02 0 5.52 3.48 5.52 6.06 0 1.6-1.22 2.58-2.72 2.58-.9 0-1.78-.5-2.8-.5s-1.9.5-2.8.5c-1.5 0-2.72-.98-2.72-2.58 0-2.58 3.5-6.06 5.52-6.06Z" />
+      </svg>
+    `,
+    east: `
+      <svg class="icon icon--east" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M13.2 5.4 19.8 12l-6.6 6.6-1.55-1.55 3.95-3.95H4.2v-2.2h11.4l-3.95-3.95L13.2 5.4Z" />
+      </svg>
+    `,
+    sync: `
+      <svg class="icon icon--sync" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M7.1 7.7A6.6 6.6 0 0 1 18.35 12h-2.2a4.4 4.4 0 0 0-7.5-3.1l1.95 1.95H4.55V4.8L7.1 7.7Z" />
+        <path d="M16.9 16.3A6.6 6.6 0 0 1 5.65 12h2.2a4.4 4.4 0 0 0 7.5 3.1l-1.95-1.95h6.05v6.05l-2.55-2.9Z" />
+      </svg>
+    `,
+    copy: `
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M8 7.5h9.5V19H8V7.5Zm2 2V17h5.5V9.5H10Z" />
+        <path d="M5 4h9.5v2H7v8.5H5V4Z" />
+      </svg>
+    `,
+    star: `
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="m12 3.8 2.4 5.05 5.55.72-4.05 3.85 1.02 5.5L12 16.2l-4.92 2.72 1.02-5.5-4.05-3.85 5.55-.72L12 3.8Z" />
+      </svg>
+    `,
+    share: `
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M17.3 15.25c1.9 0 3.45 1.55 3.45 3.45s-1.55 3.45-3.45 3.45-3.45-1.55-3.45-3.45c0-.25.03-.5.08-.74l-6.5-3.4a3.42 3.42 0 0 1-2.48 1.06A3.46 3.46 0 0 1 1.5 12.17a3.46 3.46 0 0 1 3.45-3.45c.96 0 1.83.39 2.46 1.02l6.54-3.48a3.47 3.47 0 0 1-.1-.82 3.46 3.46 0 0 1 3.45-3.45 3.46 3.46 0 0 1 3.45 3.45 3.46 3.46 0 0 1-3.45 3.45c-.96 0-1.83-.39-2.46-1.02L8.3 11.35c.06.26.1.53.1.82 0 .27-.03.54-.1.79l6.52 3.41a3.42 3.42 0 0 1 2.48-1.12Zm0 2a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9ZM4.95 10.72a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9ZM17.3 3.99a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9Z" />
+      </svg>
+    `,
+    spark: `
+      <svg class="icon icon--spark" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M11.1 2.8 12.9 8l5.2 1.8-5.2 1.8-1.8 5.2-1.8-5.2-5.2-1.8L9.3 8l1.8-5.2Z" />
+        <path d="m17.7 14.1.9 2.7 2.7.9-2.7.95-.9 2.65-.95-2.65-2.65-.95 2.65-.9.95-2.7Z" />
+      </svg>
+    `,
+  };
+
+  return icons[name];
+}
+
 export async function createTranslatorApp(
   root: HTMLElement,
   service: AppService,
 ): Promise<void> {
   root.innerHTML = `
-    <section class="app-shell" aria-labelledby="app-title">
-      <header class="top-bar">
-        <div class="brand-lockup">
-          <span class="brand-mark" aria-hidden="true">nya</span>
-          <div>
-            <h1 id="app-title">猫语翻译器</h1>
-            <p>本地可逆编码，把 Unicode 文本转换成 nya108-zh4 猫语串。</p>
+    <section class="feline-app" aria-labelledby="app-title">
+      <div class="feline-pattern" aria-hidden="true"></div>
+      <div class="ambient ambient--sun" aria-hidden="true"></div>
+      <div class="ambient ambient--sand" aria-hidden="true"></div>
+
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="hero-mark">
+            <span class="paw-float">${icon('paw')}</span>
+            <span class="whisker-line" aria-hidden="true"></span>
           </div>
-        </div>
-        <div class="runtime-cluster" aria-live="polite">
-          <span class="protocol-chip">nya108-zh4</span>
-          <span class="runtime-status" data-role="status">初始化中</span>
+          <h1 id="app-title">喵在说啥</h1>
+          <p class="tagline">
+            <span aria-hidden="true"></span>
+            THE FELINE CONNECTION
+            <span aria-hidden="true"></span>
+          </p>
         </div>
       </header>
 
-      <main class="workbench">
-        <section class="pebble-panel pebble-panel--input" aria-labelledby="input-title">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">source</p>
-              <h2 id="input-title">输入</h2>
-            </div>
-            <div class="direction-switch" aria-label="翻译方向">
-              <button type="button" data-role="direction-human">人话 -> 猫语</button>
-              <button type="button" data-role="direction-cat">猫语 -> 人话</button>
-            </div>
+      <main class="translator-stage">
+        <section class="outer-pebble" aria-label="猫语翻译器">
+          <div class="language-row" aria-label="翻译方向">
+            <button class="language-pill language-pill--source" type="button" data-role="source-label">Chinese</button>
+            <span class="language-arrow">${icon('east')}</span>
+            <button class="language-pill language-pill--target" type="button" data-role="target-label">Cat</button>
           </div>
-          <textarea
-            data-role="input"
-            aria-label="输入文本"
-            rows="12"
-            placeholder="输入人话或猫语"
-          ></textarea>
-          <div class="action-row">
-            <button class="primary-action" type="button" data-role="translate">翻译</button>
-            <button class="secondary-action" type="button" data-role="sample">示例</button>
-            <button class="secondary-action" type="button" data-role="clear">清空</button>
-          </div>
-        </section>
 
-        <section class="pebble-panel pebble-panel--output" aria-labelledby="output-title">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">result</p>
-              <h2 id="output-title">输出</h2>
-            </div>
-            <button class="secondary-action copy-action" type="button" data-role="copy">复制</button>
+          <div class="editor-grid">
+            <button class="sync-button" type="button" data-role="direction-toggle" aria-label="切换翻译方向">
+              ${icon('sync')}
+            </button>
+
+            <section class="text-panel text-panel--input" aria-labelledby="input-title">
+              <h2 id="input-title" class="sr-only">输入</h2>
+              <textarea
+                data-role="input"
+                aria-label="输入文本"
+                maxlength="5000"
+                rows="12"
+                placeholder="Type here to meow..."
+              ></textarea>
+              <div class="input-footer">
+                <span data-role="input-count">0 / 5000</span>
+              </div>
+            </section>
+
+            <section class="text-panel text-panel--output" aria-labelledby="output-title">
+              <h2 id="output-title" class="sr-only">输出</h2>
+              <textarea
+                data-role="output"
+                aria-label="输出文本"
+                rows="12"
+                placeholder="Meow, purr purr... meow? 🐾"
+                readonly
+              ></textarea>
+              <div class="output-footer">
+                <div class="icon-actions" aria-label="输出操作">
+                  <button type="button" data-role="copy" aria-label="复制">
+                    ${icon('copy')}
+                  </button>
+                  <button type="button" data-role="favorite" aria-label="收藏">
+                    ${icon('star')}
+                  </button>
+                  <button type="button" data-role="share" aria-label="分享">
+                    ${icon('share')}
+                  </button>
+                </div>
+                <div class="match-chip">
+                  ${icon('spark')}
+                  PURRFECT MATCH
+                </div>
+              </div>
+            </section>
           </div>
-          <textarea
-            data-role="output"
-            aria-label="输出文本"
-            rows="12"
-            placeholder="等待翻译结果"
-            readonly
-          ></textarea>
+
+          <img class="stitch-cat" data-role="stitch-cat" src="/stitch-cat.png" alt="Peeking cat" />
           <p class="error" data-role="error" hidden></p>
-        </section>
-
-        <section class="protocol-strip" aria-label="协议状态">
-          <div class="metric">
-            <span>codec</span>
-            <strong data-role="meta-codec">-</strong>
+          <div class="meta-row" aria-live="polite">
+            <span class="runtime-status" data-role="status">初始化中</span>
+            <span>codec <strong data-role="meta-codec">-</strong></span>
+            <span>tokenCount <strong data-role="meta-token-count">-</strong></span>
           </div>
-          <div class="metric">
-            <span>tokenCount</span>
-            <strong data-role="meta-token-count">-</strong>
+          <div class="sr-only">
+            <button type="button" data-role="sample">示例</button>
+            <button type="button" data-role="clear">清空</button>
           </div>
-          <details class="protocol-details">
-            <summary>协议摘要</summary>
-            <p>UTF-8 原文 -> raw/zstd-dict -> codec frame -> base108 digit -> 108-token 猫语表。</p>
-          </details>
         </section>
       </main>
+
+      <button class="floating-paw-action" type="button" data-role="translate" aria-label="翻译">
+        ${icon('paw')}
+      </button>
     </section>
   `;
 
@@ -113,12 +185,14 @@ export async function createTranslatorApp(
   const copy = root.querySelector<HTMLButtonElement>('[data-role="copy"]');
   const clear = root.querySelector<HTMLButtonElement>('[data-role="clear"]');
   const sample = root.querySelector<HTMLButtonElement>('[data-role="sample"]');
-  const directionHuman = root.querySelector<HTMLButtonElement>('[data-role="direction-human"]');
-  const directionCat = root.querySelector<HTMLButtonElement>('[data-role="direction-cat"]');
+  const directionToggle = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
+  const sourceLabel = root.querySelector<HTMLButtonElement>('[data-role="source-label"]');
+  const targetLabel = root.querySelector<HTMLButtonElement>('[data-role="target-label"]');
   const status = root.querySelector<HTMLElement>('[data-role="status"]');
   const error = root.querySelector<HTMLElement>('[data-role="error"]');
   const metaCodec = root.querySelector<HTMLElement>('[data-role="meta-codec"]');
   const metaTokenCount = root.querySelector<HTMLElement>('[data-role="meta-token-count"]');
+  const inputCount = root.querySelector<HTMLElement>('[data-role="input-count"]');
 
   if (
     !input ||
@@ -127,12 +201,14 @@ export async function createTranslatorApp(
     !copy ||
     !clear ||
     !sample ||
-    !directionHuman ||
-    !directionCat ||
+    !directionToggle ||
+    !sourceLabel ||
+    !targetLabel ||
     !status ||
     !error ||
     !metaCodec ||
-    !metaTokenCount
+    !metaTokenCount ||
+    !inputCount
   ) {
     throw new Error('app DOM 初始化失败');
   }
@@ -142,8 +218,10 @@ export async function createTranslatorApp(
   translate.disabled = true;
 
   const renderDirection = () => {
-    buttonPressed(directionHuman, direction === 'human-to-cat');
-    buttonPressed(directionCat, direction === 'cat-to-human');
+    sourceLabel.textContent = direction === 'human-to-cat' ? 'Chinese' : 'Cat';
+    targetLabel.textContent = direction === 'human-to-cat' ? 'Cat' : 'Chinese';
+    buttonPressed(sourceLabel, direction === 'human-to-cat');
+    buttonPressed(targetLabel, direction === 'cat-to-human');
   };
 
   const setError = (message: string | null) => {
@@ -182,15 +260,26 @@ export async function createTranslatorApp(
     }
   };
 
-  directionHuman.addEventListener('click', () => {
-    direction = 'human-to-cat';
+  const updateInputCount = () => {
+    inputCount.textContent = `${input.value.length} / 5000`;
+  };
+
+  sourceLabel.addEventListener('click', () => {
+    direction = sourceLabel.textContent === 'Chinese' ? 'human-to-cat' : 'cat-to-human';
     renderDirection();
   });
 
-  directionCat.addEventListener('click', () => {
-    direction = 'cat-to-human';
+  targetLabel.addEventListener('click', () => {
+    direction = targetLabel.textContent === 'Cat' ? 'human-to-cat' : 'cat-to-human';
     renderDirection();
   });
+
+  directionToggle.addEventListener('click', () => {
+    direction = direction === 'human-to-cat' ? 'cat-to-human' : 'human-to-cat';
+    renderDirection();
+  });
+
+  input.addEventListener('input', updateInputCount);
 
   translate.addEventListener('click', () => {
     void runTranslate();
@@ -199,6 +288,7 @@ export async function createTranslatorApp(
   clear.addEventListener('click', () => {
     input.value = '';
     output.value = '';
+    updateInputCount();
     setMeta(null);
     setError(null);
   });
@@ -206,6 +296,7 @@ export async function createTranslatorApp(
   sample.addEventListener('click', () => {
     void service.sample().then((result) => {
       input.value = result.text;
+      updateInputCount();
       setError(null);
     }).catch((err) => {
       setError(err instanceof Error ? err.message : '示例加载失败。');
@@ -214,12 +305,14 @@ export async function createTranslatorApp(
 
   copy.addEventListener('click', () => {
     void navigator.clipboard.writeText(output.value).then(() => {
-      copy.textContent = '已复制';
+      copy.setAttribute('aria-label', '已复制');
+      copy.classList.add('is-copied');
       if (copyResetTimer !== null) {
         window.clearTimeout(copyResetTimer);
       }
       copyResetTimer = window.setTimeout(() => {
-        copy.textContent = '复制';
+        copy.setAttribute('aria-label', '复制');
+        copy.classList.remove('is-copied');
         copyResetTimer = null;
       }, 1200);
     }).catch((err) => {
@@ -228,6 +321,7 @@ export async function createTranslatorApp(
   });
 
   renderDirection();
+  updateInputCount();
 
   try {
     const ready = await service.ready();
