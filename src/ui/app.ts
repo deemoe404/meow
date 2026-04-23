@@ -33,50 +33,82 @@ export async function createTranslatorApp(
   service: AppService,
 ): Promise<void> {
   root.innerHTML = `
-    <section class="page-shell">
-      <header class="hero">
-        <div class="hero__badge">nya58-zh2</div>
-        <h1>猫语翻译器</h1>
-        <p>把任意 Unicode 文本编码成严格可逆的猫语串。</p>
+    <section class="app-shell" aria-labelledby="app-title">
+      <header class="top-bar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">nya</span>
+          <div>
+            <h1 id="app-title">猫语翻译器</h1>
+            <p>本地可逆编码，把 Unicode 文本转换成 nya58-zh2 猫语串。</p>
+          </div>
+        </div>
+        <div class="runtime-cluster" aria-live="polite">
+          <span class="protocol-chip">nya58-zh2</span>
+          <span class="runtime-status" data-role="status">初始化中</span>
+        </div>
       </header>
 
-      <main class="translator-card">
-        <section class="panel">
-          <div class="panel__heading">
-            <h2>输入区</h2>
+      <main class="workbench">
+        <section class="pebble-panel pebble-panel--input" aria-labelledby="input-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">source</p>
+              <h2 id="input-title">输入</h2>
+            </div>
+            <div class="direction-switch" aria-label="翻译方向">
+              <button type="button" data-role="direction-human">人话 -> 猫语</button>
+              <button type="button" data-role="direction-cat">猫语 -> 人话</button>
+            </div>
           </div>
           <textarea
             data-role="input"
-            rows="8"
+            aria-label="输入文本"
+            rows="12"
             placeholder="输入人话或猫语"
           ></textarea>
-          <div class="panel__actions">
-            <button type="button" data-role="direction-human">人话 -> 猫语</button>
-            <button type="button" data-role="direction-cat">猫语 -> 人话</button>
+          <div class="action-row">
+            <button class="primary-action" type="button" data-role="translate">翻译</button>
+            <button class="secondary-action" type="button" data-role="sample">示例</button>
+            <button class="secondary-action" type="button" data-role="clear">清空</button>
           </div>
         </section>
 
-        <section class="panel panel--result">
-          <div class="panel__heading">
-            <h2>输出区</h2>
-            <button type="button" data-role="copy">复制结果</button>
+        <section class="pebble-panel pebble-panel--output" aria-labelledby="output-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">result</p>
+              <h2 id="output-title">输出</h2>
+            </div>
+            <button class="secondary-action copy-action" type="button" data-role="copy">复制</button>
           </div>
-          <textarea data-role="output" rows="8" readonly></textarea>
-          <div class="panel__actions">
-            <button type="button" data-role="translate">开始翻译</button>
-            <button type="button" data-role="clear">清空输入</button>
-            <button type="button" data-role="sample">随机示例</button>
-          </div>
+          <textarea
+            data-role="output"
+            aria-label="输出文本"
+            rows="12"
+            placeholder="等待翻译结果"
+            readonly
+          ></textarea>
+          <p class="error" data-role="error" hidden></p>
         </section>
 
-        <p class="status" data-role="status">正在初始化运行时…</p>
-        <p class="error" data-role="error" hidden></p>
-
-        <details class="protocol-summary" open>
-          <summary>协议摘要</summary>
-          <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base58 digit -> 58-token 猫语表。</p>
-          <pre data-role="meta">等待首个翻译结果…</pre>
-        </details>
+        <section class="protocol-strip" aria-label="协议状态">
+          <div class="metric">
+            <span>codec</span>
+            <strong data-role="meta-codec">-</strong>
+          </div>
+          <div class="metric">
+            <span>rawLength</span>
+            <strong data-role="meta-raw-length">-</strong>
+          </div>
+          <div class="metric">
+            <span>tokenCount</span>
+            <strong data-role="meta-token-count">-</strong>
+          </div>
+          <details class="protocol-details">
+            <summary>协议摘要</summary>
+            <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base58 digit -> 58-token 猫语表。</p>
+          </details>
+        </section>
       </main>
     </section>
   `;
@@ -91,7 +123,9 @@ export async function createTranslatorApp(
   const directionCat = root.querySelector<HTMLButtonElement>('[data-role="direction-cat"]');
   const status = root.querySelector<HTMLElement>('[data-role="status"]');
   const error = root.querySelector<HTMLElement>('[data-role="error"]');
-  const meta = root.querySelector<HTMLElement>('[data-role="meta"]');
+  const metaCodec = root.querySelector<HTMLElement>('[data-role="meta-codec"]');
+  const metaRawLength = root.querySelector<HTMLElement>('[data-role="meta-raw-length"]');
+  const metaTokenCount = root.querySelector<HTMLElement>('[data-role="meta-token-count"]');
 
   if (
     !input ||
@@ -104,12 +138,15 @@ export async function createTranslatorApp(
     !directionCat ||
     !status ||
     !error ||
-    !meta
+    !metaCodec ||
+    !metaRawLength ||
+    !metaTokenCount
   ) {
     throw new Error('app DOM 初始化失败');
   }
 
   let direction: Direction = 'human-to-cat';
+  let copyResetTimer: number | null = null;
   translate.disabled = true;
 
   const renderDirection = () => {
@@ -128,16 +165,9 @@ export async function createTranslatorApp(
   };
 
   const setMeta = (result: EncodeResult | DecodeResult | null) => {
-    if (!result) {
-      meta.textContent = '等待首个翻译结果…';
-      return;
-    }
-
-    meta.textContent = [
-      `codec: ${codecName(result.meta.codec)}`,
-      `rawLength: ${result.meta.rawLength}`,
-      `tokenCount: ${result.meta.tokenCount}`,
-    ].join('\n');
+    metaCodec.textContent = result ? codecName(result.meta.codec) : '-';
+    metaRawLength.textContent = result ? String(result.meta.rawLength) : '-';
+    metaTokenCount.textContent = result ? String(result.meta.tokenCount) : '-';
   };
 
   const runTranslate = async () => {
@@ -192,7 +222,16 @@ export async function createTranslatorApp(
   });
 
   copy.addEventListener('click', () => {
-    void navigator.clipboard.writeText(output.value).catch((err) => {
+    void navigator.clipboard.writeText(output.value).then(() => {
+      copy.textContent = '已复制';
+      if (copyResetTimer !== null) {
+        window.clearTimeout(copyResetTimer);
+      }
+      copyResetTimer = window.setTimeout(() => {
+        copy.textContent = '复制';
+        copyResetTimer = null;
+      }, 1200);
+    }).catch((err) => {
       setError(err instanceof Error ? err.message : '复制失败。');
     });
   });
@@ -201,7 +240,7 @@ export async function createTranslatorApp(
 
   try {
     const ready = await service.ready();
-    status.textContent = `运行时就绪：${ready.codecs.map((codec) => codec.name).join(' / ')}`;
+    status.textContent = `就绪：${ready.codecs.map((codec) => codec.name).join(' / ')}`;
     translate.disabled = false;
   } catch (err) {
     status.textContent = '运行时不可用';
