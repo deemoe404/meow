@@ -21,14 +21,14 @@ function createHandler() {
       requests.push(`encode:${text}`);
       return {
         cat: '！喵喵mew',
-        meta: { codec: 0, rawLength: text.length, tokenCount: 3 },
+        meta: { codec: 0, tokenCount: 3 },
       };
     },
     async decode(cat) {
       requests.push(`decode:${cat}`);
       return {
         text: 'decoded',
-        meta: { codec: 1, rawLength: 7, tokenCount: 9 },
+        meta: { codec: 1, tokenCount: 9 },
       };
     },
     sample() {

@@ -16,8 +16,6 @@ function codecName(codec: number): string {
       return 'raw';
     case 1:
       return 'zstd-dict';
-    case 2:
-      return 'cmix';
     default:
       return `unknown(${codec})`;
   }
@@ -39,11 +37,11 @@ export async function createTranslatorApp(
           <span class="brand-mark" aria-hidden="true">nya</span>
           <div>
             <h1 id="app-title">猫语翻译器</h1>
-            <p>本地可逆编码，把 Unicode 文本转换成 nya58-zh2 猫语串。</p>
+            <p>本地可逆编码，把 Unicode 文本转换成 nya58-zh3 猫语串。</p>
           </div>
         </div>
         <div class="runtime-cluster" aria-live="polite">
-          <span class="protocol-chip">nya58-zh2</span>
+          <span class="protocol-chip">nya58-zh3</span>
           <span class="runtime-status" data-role="status">初始化中</span>
         </div>
       </header>
@@ -97,16 +95,12 @@ export async function createTranslatorApp(
             <strong data-role="meta-codec">-</strong>
           </div>
           <div class="metric">
-            <span>rawLength</span>
-            <strong data-role="meta-raw-length">-</strong>
-          </div>
-          <div class="metric">
             <span>tokenCount</span>
             <strong data-role="meta-token-count">-</strong>
           </div>
           <details class="protocol-details">
             <summary>协议摘要</summary>
-            <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base58 digit -> 58-token 猫语表。</p>
+            <p>UTF-8 原文 -> raw/zstd-dict -> codec frame -> base58 digit -> 58-token 猫语表。</p>
           </details>
         </section>
       </main>
@@ -124,7 +118,6 @@ export async function createTranslatorApp(
   const status = root.querySelector<HTMLElement>('[data-role="status"]');
   const error = root.querySelector<HTMLElement>('[data-role="error"]');
   const metaCodec = root.querySelector<HTMLElement>('[data-role="meta-codec"]');
-  const metaRawLength = root.querySelector<HTMLElement>('[data-role="meta-raw-length"]');
   const metaTokenCount = root.querySelector<HTMLElement>('[data-role="meta-token-count"]');
 
   if (
@@ -139,7 +132,6 @@ export async function createTranslatorApp(
     !status ||
     !error ||
     !metaCodec ||
-    !metaRawLength ||
     !metaTokenCount
   ) {
     throw new Error('app DOM 初始化失败');
@@ -166,7 +158,6 @@ export async function createTranslatorApp(
 
   const setMeta = (result: EncodeResult | DecodeResult | null) => {
     metaCodec.textContent = result ? codecName(result.meta.codec) : '-';
-    metaRawLength.textContent = result ? String(result.meta.rawLength) : '-';
     metaTokenCount.textContent = result ? String(result.meta.tokenCount) : '-';
   };
 

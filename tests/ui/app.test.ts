@@ -14,12 +14,11 @@ function createService(overrides: Partial<AppService> = {}): AppService {
         wasmLoaded: true,
       };
     },
-    async encode(text) {
+    async encode() {
       return {
         cat: '！喵喵mewMEW',
         meta: {
           codec: 1,
-          rawLength: text.length,
           tokenCount: 4,
         },
       };
@@ -29,7 +28,6 @@ function createService(overrides: Partial<AppService> = {}): AppService {
         text: `decoded:${cat}`,
         meta: {
           codec: 1,
-          rawLength: cat.length,
           tokenCount: 4,
         },
       };
@@ -54,7 +52,7 @@ describe('translator app', () => {
     await createTranslatorApp(root, createService());
 
     expect(root.querySelector('h1')?.textContent).toBe('猫语翻译器');
-    expect(root.textContent).toContain('nya58-zh2');
+    expect(root.textContent).toContain('nya58-zh3');
     expect(root.textContent).toMatch(/本地可逆编码/);
     expect(root.querySelector('#input-title')?.textContent).toBe('输入');
     expect(root.querySelector('#output-title')?.textContent).toBe('输出');
@@ -63,7 +61,7 @@ describe('translator app', () => {
     expect(root.querySelector('[data-role="clear"]')?.textContent).toBe('清空');
     expect(root.querySelector('[data-role="sample"]')?.textContent).toBe('示例');
     expect(root.textContent).toContain('codec');
-    expect(root.textContent).toContain('rawLength');
+    expect(root.textContent).not.toContain('rawLength');
     expect(root.textContent).toContain('tokenCount');
     expect(root.querySelector('[data-role="direction-human"]')?.textContent).toBe('人话 -> 猫语');
     expect(root.querySelector('[data-role="direction-cat"]')?.textContent).toBe('猫语 -> 人话');
@@ -92,8 +90,10 @@ describe('translator app', () => {
     expect(encode).toHaveBeenCalledWith('你好，猫猫');
     expect(output!.value).toBe('！喵喵mewMEW');
     expect(root.querySelector('[data-role="meta-codec"]')?.textContent).toBe('zstd-dict');
-    expect(root.querySelector('[data-role="meta-raw-length"]')?.textContent).toBe('5');
     expect(root.querySelector('[data-role="meta-token-count"]')?.textContent).toBe('4');
+    expect(root.textContent).not.toContain('rawLength');
+    expect(root.textContent).not.toContain('dictId');
+    expect(root.textContent).not.toContain('payloadLength');
   });
 
   it('switches direction before translating and does not render uppercase mode controls', async () => {
@@ -148,12 +148,11 @@ describe('translator app', () => {
     document.body.append(root);
 
     const service = createService({
-      async encode(text) {
+      async encode() {
         return {
           cat: 'encoded-cat',
           meta: {
             codec: 1,
-            rawLength: text.length,
             tokenCount: 4,
           },
         };

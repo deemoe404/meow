@@ -7,28 +7,33 @@ describe('protocol frame', () => {
     const payload = Uint8Array.from([1, 2, 3, 4, 5]);
     const frame = packFrame({
       codec: 0,
-      rawLength: 5,
       payload,
     });
     const unpacked = unpackFrame(frame);
 
-    expect(unpacked.version).toBe(2);
+    expect(frame).toEqual(Uint8Array.from([1, 1, 2, 3, 4, 5]));
     expect(unpacked.codec).toBe(0);
-    expect(unpacked.rawLength).toBe(5);
     expect(unpacked.payload).toEqual(payload);
   });
 
-  it('rejects bad magic', () => {
-    const bad = Uint8Array.from([0, 0, 1, 0, 0, 0, 0, 0, 0]);
-    expect(() => unpackFrame(bad)).toThrowError(/magic/i);
+  it('packs zstd-dict with a non-zero wire tag', () => {
+    const payload = Uint8Array.from([9, 8]);
+    const frame = packFrame({
+      codec: 1,
+      payload,
+    });
+    const unpacked = unpackFrame(frame);
+
+    expect(frame).toEqual(Uint8Array.from([2, 9, 8]));
+    expect(unpacked.codec).toBe(1);
+    expect(unpacked.payload).toEqual(payload);
   });
 
   it('treats the remaining bytes as payload', () => {
-    const frame = Uint8Array.from([0x4e, 0x59, 0x02, 0x01, 0x03, 0x09, 0x08]);
+    const frame = Uint8Array.from([2, 0x09, 0x08]);
     const unpacked = unpackFrame(frame);
 
     expect(unpacked.codec).toBe(1);
-    expect(unpacked.rawLength).toBe(3);
     expect(unpacked.payload).toEqual(Uint8Array.from([0x09, 0x08]));
   });
 });
