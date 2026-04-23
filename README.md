@@ -71,6 +71,7 @@ codec tag 固定为：
 浏览器端使用仓库内静态资产 [src/assets/dict_v1.bin](src/assets/dict_v1.bin)。
 
 训练种子样本位于 [protocol/dict_v1/samples](protocol/dict_v1/samples)，可用下面的命令重新生成字典：
+样本来源记录见 [protocol/dict_v1/SOURCES.md](protocol/dict_v1/SOURCES.md)。
 
 ```bash
 python3 -m pip install --target /tmp/zstdpy zstandard

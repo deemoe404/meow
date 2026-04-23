@@ -1,0 +1,87 @@
+https://example.com/search?q=%E7%8C%AB%E8%AF%AD
+https://example.com/search?q=%E5%96%B5%E5%96%B5
+https://example.com/search?q=%E6%83%85%E7%BB%AA%E4%BB%B7%E5%80%BC
+https://example.com/search?q=%E7%8F%AD%E5%91%B3
+https://example.com/search?q=%E6%9D%BE%E5%BC%9B%E6%84%9F
+https://example.com/search?q=%E5%B0%8A%E5%98%9F%E5%81%87%E5%98%9F
+https://example.com/search?q=%E7%9C%9F%E5%98%9F%E5%81%87%E5%98%9F
+https://example.com/search?q=%E7%AC%91%E4%B8%8D%E6%B4%BB%E4%BA%86
+https://example.com/search?q=%E7%BB%B7%E4%B8%8D%E4%BD%8F%E4%BA%86
+https://example.com/search?q=%E8%A0%8C%E5%9F%A0%E4%BD%8F%E4%BA%86
+https://example.com/search?q=%E7%BB%9D%E7%BB%9D%E5%AD%90
+https://example.com/search?q=%E6%B3%B0%E8%A3%A4%E8%BE%A3
+https://example.com/search?q=%E6%A0%93Q
+https://example.com/search?q=yyds
+https://example.com/search?q=YYDS
+https://example.com/search?q=u1s1
+https://example.com/search?q=xswl
+https://example.com/meow?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E7%8C%AB%E7%8C%AB%EF%BC%81&mode=encode
+https://example.com/meow?text=%E6%88%91%E7%9C%9F%E7%9A%84%E4%BC%9A%E8%B0%A2%F0%9F%98%AD&mode=encode
+https://example.com/meow?text=%E7%BB%B7%E4%B8%8D%E4%BD%8F%E4%BA%86%F0%9F%98%82&mode=encode
+https://example.com/meow?text=%F0%9F%91%8D%F0%9F%8F%BB%F0%9F%91%8D%F0%9F%8F%BC%F0%9F%91%8D%F0%9F%8F%BD%F0%9F%91%8D%F0%9F%8F%BE%F0%9F%91%8D%F0%9F%8F%BF&mode=encode
+https://example.com/share/long/2026/04/23/cat-codec-demo?title=%E7%8C%AB%E8%AF%AD%E7%BF%BB%E8%AF%91%E5%99%A8&summary=%E5%8F%AF%E9%80%86%E7%BC%96%E7%A0%81&from=timeline
+https://example.com/share/long/2026/04/23/cat-codec-demo?title=%E5%B0%8A%E5%98%9F%E5%81%87%E5%98%9F&summary=%E7%9F%AD%E5%8F%A5%E8%B5%B0raw&from=chat
+https://example.com/share/long/2026/04/23/cat-codec-demo?title=%E6%83%85%E7%BB%AA%E4%BB%B7%E5%80%BC&summary=%F0%9F%AB%B6&from=group
+https://example.com/post/abc123?utm_source=wechat&utm_medium=share&utm_campaign=meow_codec
+https://example.com/post/abc123?utm_source=timeline&utm_medium=social&utm_campaign=dict_v1
+https://example.com/post/abc123?utm_source=group&utm_medium=copy&utm_campaign=zstd_dict
+https://example.com/post/abc123?utm_source=github&utm_medium=issue&utm_campaign=roundtrip
+https://example.com/post/abc123?utm_source=notes&utm_medium=clipboard&utm_campaign=unicode
+https://example.com/post/abc123?spm=1001.2014.3001.5501
+https://example.com/post/abc123?spm=cat.codec.share.001
+https://example.com/post/abc123?spm=meow.worker.ready.20260423
+https://example.com/post/abc123?from=timeline
+https://example.com/post/abc123?from=group
+https://example.com/post/abc123?from=chat
+https://example.com/post/abc123?from=copylink
+https://example.com/post/abc123?from=browser
+https://example.com/post/abc123#comment-123
+https://example.com/post/abc123#comment-456
+https://example.com/post/abc123#reply-123
+https://example.com/post/abc123#floor-12
+https://example.com/post/abc123#issuecomment-1234567890
+https://example.com/video/BV1cat411meow
+https://example.com/video/BV1xx411c7mD?p=1&vd_source=catcodec
+https://example.com/video/BV1xx411c7mD?spm_id_from=333.337.search-card.all.click
+https://example.com/video/BV1cat411meow?from=timeline&utm_source=share
+https://example.com/video/BV1cat411meow#reply123
+https://example.com/xhs/note/660000000000000000000001
+https://example.com/xhs/note/660000000000000000000001?xsec_token=cat_token&xsec_source=pc_share
+https://example.com/xhs/note/660000000000000000000001?from=timeline&share_from_user_hidden=true
+https://example.com/xhs/note/660000000000000000000001#comment-123
+https://example.com/weibo/5000000000/MeowCodec
+https://example.com/weibo/5000000000/MeowCodec?refer_flag=1001030103_
+https://example.com/weibo/5000000000/MeowCodec?from=page_100505&mod=TAB
+https://example.com/weibo/5000000000/MeowCodec#comment-123
+https://example.com/zhihu/question/123456789/answer/987654321
+https://example.com/zhihu/question/123456789/answer/987654321?utm_psn=1234567890
+https://example.com/zhihu/question/123456789/answer/987654321?from=timeline
+https://example.com/zhihu/question/123456789/answer/987654321#comment-123
+https://example.com/space/123456?spm_id_from=333.999.0.0
+https://example.com/note/cat-codec?utm_source=copyLink&utm_medium=social
+https://example.com/status/1234567890?from=timeline&is_all=1
+https://example.com/question/123456789?utm_campaign=shareopn&utm_medium=social&utm_source=wechat_session
+https://example.com/search?keyword=%E7%8C%AB%E8%AF%AD&from_source=webtop_search&spm=cat.search.0.0
+https://example.com/search?keyword=%E5%8F%AF%E9%80%86%E7%BC%96%E7%A0%81&from_source=chat&spm=meow.search.0.0
+https://example.com/search?keyword=%F0%9F%98%BA&from_source=emoji&spm=emoji.search.0.0
+https://example.com/s/CatCodecShareToken_0123456789abcdef
+https://example.com/s/CatCodecShareToken_0123456789abcdef?pwd=meow
+https://example.com/s/CatCodecShareToken_0123456789abcdef?pwd=meow&from=timeline
+https://example.com/s/CatCodecShareToken_0123456789abcdef?pwd=meow#comment-123
+长分享链接：https://example.com/share/long/2026/04/23/cat-codec-demo?title=%E7%8C%AB%E8%AF%AD%E7%BF%BB%E8%AF%91%E5%99%A8&summary=%E6%B5%8B%E8%AF%95zstd-dict&from=timeline&utm_source=wechat&utm_medium=share&utm_campaign=dict_v1#comment-123
+B 站形态示例：https://example.com/video/BV1cat411meow?spm_id_from=333.337.search-card.all.click#reply123
+小红书形态示例：https://example.com/xhs/note/660000000000000000000001?xsec_token=cat_token&xsec_source=pc_share#comment-123
+微博形态示例：https://example.com/weibo/5000000000/MeowCodec?refer_flag=1001030103_#comment-123
+知乎形态示例：https://example.com/zhihu/question/123456789/answer/987654321?utm_psn=1234567890#comment-123
+中文 query + emoji：https://example.com/search?q=%E6%88%91%E7%9C%9F%E7%9A%84%E4%BC%9A%E8%B0%A2%F0%9F%98%AD&from=timeline
+中文 query + 网络语：https://example.com/search?q=%E5%B0%8A%E5%98%9F%E5%81%87%E5%98%9F&spm=cat.slang.0.0
+中文 query + 技术词：https://example.com/search?q=zstd-dict%20worker%20ready&from=github
+中文 query + 全角标点：https://example.com/search?q=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E7%8C%AB%E7%8C%AB%EF%BC%81
+URL 混合文本：请打开 https://example.com/post/abc123?from=timeline#comment-123 看一下评论。
+URL 混合文本：这个链接带 spm，https://example.com/post/abc123?spm=1001.2014.3001.5501
+URL 混合文本：分享参数是 utm_source=wechat&utm_medium=share&utm_campaign=meow_codec。
+URL 混合文本：短链 https://example.com/s/CatCodecShareToken_0123456789abcdef?pwd=meow
+URL 混合文本：B 站形态但不使用真实域名，路径只模拟 BV 和 reply。
+URL 混合文本：小红书形态但不复制真实笔记内容。
+URL 混合文本：微博形态但只保留路径结构。
+URL 混合文本：知乎形态但只保留 question / answer / comment 结构。

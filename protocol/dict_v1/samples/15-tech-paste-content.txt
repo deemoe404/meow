@@ -1,0 +1,130 @@
+{"codec":"raw","ok":true,"tokenCount":42}
+{"codec":"zstd-dict","ok":true,"tokenCount":108}
+{"wasmLoaded":true,"codecs":["raw","zstd-dict"]}
+{"type":"encode","id":1,"text":"你好，猫猫！"}
+{"type":"decode","id":2,"cat":"喵喵咪喵喵呜"}
+{"ok":false,"error":"runtime-unavailable","message":"浏览器压缩运行时初始化失败。"}
+{"ok":false,"error":"unsupported","message":"不支持的 codec tag: 3"}
+{"ok":false,"error":"corrupted-data","message":"frame 太短。"}
+{"url":"https://example.com/meow?mode=encode&from=timeline#comment-123","emoji":"😺","slang":"尊嘟假嘟"}
+{"input":{"text":"我真的会谢😭","mode":"encode"},"output":{"codec":"zstd-dict","tokens":88}}
+{
+  "codec": "zstd-dict",
+  "ready": true,
+  "worker": "ready",
+  "wasm": "loaded",
+  "dict": "dict_v1"
+}
+{
+  "url": "https://example.com/post/abc123?spm=1001.2014.3001.5501#comment-123",
+  "title": "猫语翻译器",
+  "tags": ["zstd-dict", "emoji", "URL"]
+}
+# 猫语翻译器
+## 协议摘要
+UTF-8 原文 -> raw/zstd-dict -> codec frame -> base108 digit -> 108-token 猫语表。
+**重点**：协议是可逆编码，不是语义翻译。
+`raw` 和 `zstd-dict` 会自动择短。
+[预览链接](https://example.com/meow?mode=encode&from=markdown)
+![图片占位](https://example.com/assets/cat.png)
+> 引用：复制回输入框应该能完整解码。
+- worker ready
+- wasm loaded
+- dict ready
+1. 输入人话
+2. 复制猫语
+3. 粘贴解码
+```ts
+const DEFAULT_COMPRESSION_LEVEL = 10;
+const codec = createNya108Codec(compression);
+await codec.encode('你好，猫猫！');
+```
+```json
+{"codec":"zstd-dict","ready":true}
+```
+```bash
+pnpm test && pnpm build
+```
+pnpm install
+pnpm test
+pnpm build
+pnpm preview
+pnpm exec vitest run
+pnpm exec vite build
+git status --short
+git diff --stat
+git diff -- protocol/dict_v1/samples
+git worktree list
+git branch --show-current
+python3 -m pip install --target /tmp/zstdpy zstandard
+PYTHONPATH=/tmp/zstdpy python3 scripts/train_dict_v1.py
+curl -fsSL https://example.com/meow?mode=encode
+bzcat cmn_sentences_CC0.tsv.bz2
+node --version
+mise x pnpm@10.33.1 -- pnpm test
+MISE_TRUSTED_CONFIG_PATHS="$PWD/mise.toml:/Users/sam/Projects/meow/mise.toml" mise x pnpm@10.33.1 -- pnpm build
+Error: 不支持的 codec tag: 3
+Error: frame 太短。
+Error: 浏览器压缩运行时初始化失败。
+Error: 无法加载字典资源：404
+TypeError: Cannot read properties of undefined (reading 'payload')
+TypeError: Failed to fetch
+DOMException: The user aborted a request.
+ProtocolError: token 无法解析。
+ProtocolError: payload 无法解码。
+RuntimeError: unreachable
+Unhandled rejection: runtime-unavailable
+stack trace:
+    at unpackFrame (src/protocol/frame.ts:48:11)
+    at Object.decode (src/protocol/nya108.ts:42:19)
+    at async handleDecode (src/worker/handler.ts:31:18)
+    at async self.onmessage (src/worker/protocol.worker.ts:31:20)
+stack trace:
+    at createBrowserCompressionAdapter (src/protocol/browser-compression.ts:15:1)
+    at async ensureAdapter (src/protocol/browser-compression.ts:19:3)
+    at async Object.choosePayload (src/protocol/browser-compression.ts:63:13)
+    at async encode (src/protocol/nya108.ts:26:20)
+Traceback (most recent call last):
+  File "scripts/train_dict_v1.py", line 58, in main
+    zstd = load_zstandard()
+  File "scripts/train_dict_v1.py", line 13, in load_zstandard
+    import zstandard as zstd
+ModuleNotFoundError: No module named 'zstandard'
+/Users/sam/Projects/meow/src/protocol/compression.ts
+/Users/sam/Projects/meow/src/protocol/browser-compression.ts
+/Users/sam/Projects/meow/src/protocol/nya108.ts
+/Users/sam/Projects/meow/src/protocol/frame.ts
+/Users/sam/Projects/meow/src/protocol/tokens.ts
+/Users/sam/Projects/meow/src/assets/dict_v1.bin
+/Users/sam/Projects/meow/protocol/dict_v1/samples/15-tech-paste-content.txt
+/Users/sam/Projects/meow/tests/protocol/compression.test.ts
+/Users/sam/Projects/meow/tests/protocol/nya108.test.ts
+./src/protocol/compression.ts
+./src/protocol/browser-compression.ts
+./src/assets/dict_v1.bin
+../protocol/dict_v1/samples
+C:\Users\cat\Downloads\meow.txt
+C:\Users\cat\Desktop\cat-codec.json
+C:\Projects\meow\src\protocol\compression.ts
+https://github.com/deemoe404/meow/issues/1
+https://github.com/deemoe404/meow/issues/1#issuecomment-1234567890
+https://github.com/deemoe404/meow/pull/1
+https://github.com/deemoe404/meow/pull/1/files
+https://github.com/deemoe404/meow/pull/1/checks
+https://github.com/deemoe404/meow/actions/runs/1234567890
+https://github.com/deemoe404/meow/actions/workflows/pages.yml
+https://github.com/deemoe404/meow/blob/main/src/protocol/compression.ts#L59
+https://github.com/deemoe404/meow/blob/main/src/protocol/frame.ts#L4
+GitHub issue: https://github.com/deemoe404/meow/issues/12
+GitHub PR: https://github.com/deemoe404/meow/pull/34
+GitHub review comment: https://github.com/deemoe404/meow/pull/34#discussion_r1234567890
+GitHub action run: https://github.com/deemoe404/meow/actions/runs/1234567890
+日志片段：[vite] building for production...
+日志片段：✓ 6 modules transformed.
+日志片段：dist/assets/dict_v1.bin 8.56 kB
+日志片段：Test Files 8 passed (8)
+日志片段：Tests 33 passed (33)
+日志片段：worker ready / wasm loaded / dict ready
+日志片段：codec=zstd-dict tokenCount=108
+日志片段：compressed.length < raw.length
+日志片段：compressed.length >= raw.length, keep raw
