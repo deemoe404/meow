@@ -26,7 +26,7 @@ function buttonPressed(button: HTMLButtonElement, active: boolean): void {
   button.classList.toggle('is-active', active);
 }
 
-type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share' | 'spark';
+type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share';
 
 function icon(name: IconName): string {
   const icons: Record<IconName, string> = {
@@ -67,12 +67,6 @@ function icon(name: IconName): string {
         <path d="M17.3 15.25c1.9 0 3.45 1.55 3.45 3.45s-1.55 3.45-3.45 3.45-3.45-1.55-3.45-3.45c0-.25.03-.5.08-.74l-6.5-3.4a3.42 3.42 0 0 1-2.48 1.06A3.46 3.46 0 0 1 1.5 12.17a3.46 3.46 0 0 1 3.45-3.45c.96 0 1.83.39 2.46 1.02l6.54-3.48a3.47 3.47 0 0 1-.1-.82 3.46 3.46 0 0 1 3.45-3.45 3.46 3.46 0 0 1 3.45 3.45 3.46 3.46 0 0 1-3.45 3.45c-.96 0-1.83-.39-2.46-1.02L8.3 11.35c.06.26.1.53.1.82 0 .27-.03.54-.1.79l6.52 3.41a3.42 3.42 0 0 1 2.48-1.12Zm0 2a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9ZM4.95 10.72a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9ZM17.3 3.99a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9Z" />
       </svg>
     `,
-    spark: `
-      <svg class="icon icon--spark" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-        <path d="M11.1 2.8 12.9 8l5.2 1.8-5.2 1.8-1.8 5.2-1.8-5.2-5.2-1.8L9.3 8l1.8-5.2Z" />
-        <path d="m17.7 14.1.9 2.7 2.7.9-2.7.95-.9 2.65-.95-2.65-2.65-.95 2.65-.9.95-2.7Z" />
-      </svg>
-    `,
   };
 
   return icons[name];
@@ -106,9 +100,9 @@ export async function createTranslatorApp(
       <main class="translator-stage">
         <section class="outer-pebble" aria-label="猫语翻译器">
           <div class="language-row" aria-label="翻译方向">
-            <button class="language-pill language-pill--source" type="button" data-role="source-label">Chinese</button>
+            <button class="language-pill language-pill--source language-pill--chinese" type="button" data-role="source-label">Chinese</button>
             <span class="language-arrow">${icon('east')}</span>
-            <button class="language-pill language-pill--target" type="button" data-role="target-label">Cat</button>
+            <button class="language-pill language-pill--target language-pill--cat" type="button" data-role="target-label">Cat</button>
           </div>
 
           <div class="editor-grid">
@@ -151,10 +145,6 @@ export async function createTranslatorApp(
                     ${icon('share')}
                   </button>
                 </div>
-                <div class="match-chip">
-                  ${icon('spark')}
-                  PURRFECT MATCH
-                </div>
               </div>
             </section>
           </div>
@@ -193,8 +183,10 @@ export async function createTranslatorApp(
   const metaCodec = root.querySelector<HTMLElement>('[data-role="meta-codec"]');
   const metaTokenCount = root.querySelector<HTMLElement>('[data-role="meta-token-count"]');
   const inputCount = root.querySelector<HTMLElement>('[data-role="input-count"]');
+  const app = root.querySelector<HTMLElement>('.feline-app');
 
   if (
+    !app ||
     !input ||
     !output ||
     !translate ||
@@ -215,11 +207,67 @@ export async function createTranslatorApp(
 
   let direction: Direction = 'human-to-cat';
   let copyResetTimer: number | null = null;
+  let swapResetTimer: number | null = null;
   translate.disabled = true;
 
+  const animateSwap = (nextDirection: Direction) => {
+    const sourceBefore = sourceLabel.getBoundingClientRect();
+    const targetBefore = targetLabel.getBoundingClientRect();
+
+    app.classList.remove(
+      'is-panel-swapping',
+      'is-panel-swapping-to-human',
+      'is-panel-swapping-to-cat',
+    );
+    void app.offsetWidth;
+    app.classList.add(
+      'is-panel-swapping',
+      nextDirection === 'cat-to-human'
+        ? 'is-panel-swapping-to-human'
+        : 'is-panel-swapping-to-cat',
+    );
+
+    const previousInput = input.value;
+    input.value = output.value;
+    output.value = previousInput;
+    updateInputCount();
+
+    renderDirection();
+
+    const sourceAfter = sourceLabel.getBoundingClientRect();
+    const targetAfter = targetLabel.getBoundingClientRect();
+    sourceLabel.style.setProperty('--language-slide-x', `${sourceBefore.left - sourceAfter.left}px`);
+    targetLabel.style.setProperty('--language-slide-x', `${targetBefore.left - targetAfter.left}px`);
+    sourceLabel.classList.remove('is-language-swapping');
+    targetLabel.classList.remove('is-language-swapping');
+    void sourceLabel.offsetWidth;
+    sourceLabel.classList.add('is-language-swapping');
+    targetLabel.classList.add('is-language-swapping');
+
+    if (swapResetTimer !== null) {
+      window.clearTimeout(swapResetTimer);
+    }
+    swapResetTimer = window.setTimeout(() => {
+      app.classList.remove(
+        'is-panel-swapping',
+        'is-panel-swapping-to-human',
+        'is-panel-swapping-to-cat',
+      );
+      sourceLabel.classList.remove('is-language-swapping');
+      targetLabel.classList.remove('is-language-swapping');
+      sourceLabel.style.removeProperty('--language-slide-x');
+      targetLabel.style.removeProperty('--language-slide-x');
+      swapResetTimer = null;
+    }, 620);
+  };
+
   const renderDirection = () => {
-    sourceLabel.textContent = direction === 'human-to-cat' ? 'Chinese' : 'Cat';
-    targetLabel.textContent = direction === 'human-to-cat' ? 'Cat' : 'Chinese';
+    const inputIsCat = direction === 'cat-to-human';
+    app.classList.toggle('is-cat-to-human', direction === 'cat-to-human');
+    input.classList.toggle('text-content--cat', inputIsCat);
+    input.classList.toggle('text-content--chinese', !inputIsCat);
+    output.classList.toggle('text-content--cat', !inputIsCat);
+    output.classList.toggle('text-content--chinese', inputIsCat);
     buttonPressed(sourceLabel, direction === 'human-to-cat');
     buttonPressed(targetLabel, direction === 'cat-to-human');
   };
@@ -265,18 +313,23 @@ export async function createTranslatorApp(
   };
 
   sourceLabel.addEventListener('click', () => {
-    direction = sourceLabel.textContent === 'Chinese' ? 'human-to-cat' : 'cat-to-human';
-    renderDirection();
+    if (direction === 'cat-to-human') {
+      direction = 'human-to-cat';
+      animateSwap(direction);
+    }
   });
 
   targetLabel.addEventListener('click', () => {
-    direction = targetLabel.textContent === 'Cat' ? 'human-to-cat' : 'cat-to-human';
-    renderDirection();
+    if (direction === 'human-to-cat') {
+      direction = 'cat-to-human';
+      animateSwap(direction);
+    }
   });
 
   directionToggle.addEventListener('click', () => {
-    direction = direction === 'human-to-cat' ? 'cat-to-human' : 'human-to-cat';
-    renderDirection();
+    const nextDirection = direction === 'human-to-cat' ? 'cat-to-human' : 'human-to-cat';
+    direction = nextDirection;
+    animateSwap(nextDirection);
   });
 
   input.addEventListener('input', updateInputCount);
