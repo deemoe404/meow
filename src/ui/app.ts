@@ -100,9 +100,9 @@ export async function createTranslatorApp(
       <main class="translator-stage">
         <section class="outer-pebble" aria-label="猫语翻译器">
           <div class="language-row" aria-label="翻译方向">
-            <button class="language-pill language-pill--source" type="button" data-role="source-label">Chinese</button>
+            <button class="language-pill language-pill--source language-pill--chinese" type="button" data-role="source-label">Chinese</button>
             <span class="language-arrow">${icon('east')}</span>
-            <button class="language-pill language-pill--target" type="button" data-role="target-label">Cat</button>
+            <button class="language-pill language-pill--target language-pill--cat" type="button" data-role="target-label">Cat</button>
           </div>
 
           <div class="editor-grid">
@@ -227,6 +227,11 @@ export async function createTranslatorApp(
         : 'is-panel-swapping-to-cat',
     );
 
+    const previousInput = input.value;
+    input.value = output.value;
+    output.value = previousInput;
+    updateInputCount();
+
     renderDirection();
 
     const sourceAfter = sourceLabel.getBoundingClientRect();
@@ -257,9 +262,12 @@ export async function createTranslatorApp(
   };
 
   const renderDirection = () => {
+    const inputIsCat = direction === 'cat-to-human';
     app.classList.toggle('is-cat-to-human', direction === 'cat-to-human');
-    sourceLabel.textContent = direction === 'human-to-cat' ? 'Chinese' : 'Cat';
-    targetLabel.textContent = direction === 'human-to-cat' ? 'Cat' : 'Chinese';
+    input.classList.toggle('text-content--cat', inputIsCat);
+    input.classList.toggle('text-content--chinese', !inputIsCat);
+    output.classList.toggle('text-content--cat', !inputIsCat);
+    output.classList.toggle('text-content--chinese', inputIsCat);
     buttonPressed(sourceLabel, direction === 'human-to-cat');
     buttonPressed(targetLabel, direction === 'cat-to-human');
   };
@@ -305,13 +313,17 @@ export async function createTranslatorApp(
   };
 
   sourceLabel.addEventListener('click', () => {
-    direction = sourceLabel.textContent === 'Chinese' ? 'human-to-cat' : 'cat-to-human';
-    renderDirection();
+    if (direction === 'cat-to-human') {
+      direction = 'human-to-cat';
+      animateSwap(direction);
+    }
   });
 
   targetLabel.addEventListener('click', () => {
-    direction = targetLabel.textContent === 'Cat' ? 'human-to-cat' : 'cat-to-human';
-    renderDirection();
+    if (direction === 'human-to-cat') {
+      direction = 'cat-to-human';
+      animateSwap(direction);
+    }
   });
 
   directionToggle.addEventListener('click', () => {

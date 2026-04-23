@@ -55,6 +55,8 @@ describe('translator app', () => {
     expect(root.textContent).toContain('THE FELINE CONNECTION');
     expect(root.querySelector('[data-role="source-label"]')?.textContent).toBe('Chinese');
     expect(root.querySelector('[data-role="target-label"]')?.textContent).toBe('Cat');
+    expect(root.querySelector('[data-role="source-label"]')?.classList.contains('language-pill--chinese')).toBe(true);
+    expect(root.querySelector('[data-role="target-label"]')?.classList.contains('language-pill--cat')).toBe(true);
     expect(root.querySelector('[data-role="stitch-cat"]')?.getAttribute('src')).toBe('stitch-cat.png');
     expect(root.querySelector('[data-role="translate"]')?.getAttribute('aria-label')).toBe('翻译');
     expect(root.querySelector('[data-role="copy"]')?.getAttribute('aria-label')).toBe('复制');
@@ -88,6 +90,8 @@ describe('translator app', () => {
     expect(input).not.toBeNull();
     expect(translate).not.toBeNull();
     expect(output).not.toBeNull();
+    expect(input!.classList.contains('text-content--chinese')).toBe(true);
+    expect(output!.classList.contains('text-content--cat')).toBe(true);
 
     input!.value = '你好，猫猫';
     input!.dispatchEvent(new Event('input', { bubbles: true }));
@@ -115,10 +119,17 @@ describe('translator app', () => {
     const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
     const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
 
+    input!.value = '你好，猫猫';
+    output!.value = '！喵喵mewMEW';
     reverse!.click();
     expect(root.querySelector('.feline-app')?.classList.contains('is-cat-to-human')).toBe(true);
     expect(root.querySelector('.feline-app')?.classList.contains('is-panel-swapping')).toBe(true);
-    input!.value = '！喵喵mewMEW';
+    expect(input!.readOnly).toBe(false);
+    expect(output!.readOnly).toBe(true);
+    expect(input!.value).toBe('！喵喵mewMEW');
+    expect(output!.value).toBe('你好，猫猫');
+    expect(input!.classList.contains('text-content--cat')).toBe(true);
+    expect(output!.classList.contains('text-content--chinese')).toBe(true);
     input!.dispatchEvent(new Event('input', { bubbles: true }));
     translate!.click();
     await flush();
