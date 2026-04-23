@@ -264,6 +264,7 @@ textarea:focus-visible {
   border-radius: 14px 18px 16px 15px;
   background: transparent;
   color: var(--ink-soft);
+  clip-path: polygon(7% 0, 96% 5%, 100% 86%, 92% 100%, 4% 94%, 0 14%);
 }
 
 .direction-switch button:hover:not(:disabled),
@@ -295,6 +296,7 @@ textarea:focus-visible {
   background: linear-gradient(180deg, var(--control), var(--control-hover));
   color: #f6f8fb;
   box-shadow: 0 14px 24px rgba(23, 36, 58, 0.18);
+  clip-path: polygon(7% 0, 94% 5%, 100% 58%, 86% 100%, 9% 92%, 0 36%);
 }
 
 .primary-action:hover:not(:disabled) {
@@ -306,6 +308,7 @@ textarea:focus-visible {
   border-radius: 14px;
   background: var(--control-soft);
   color: var(--control);
+  clip-path: polygon(8% 0, 100% 10%, 92% 100%, 0 88%);
 }
 
 .secondary-action:hover:not(:disabled),
