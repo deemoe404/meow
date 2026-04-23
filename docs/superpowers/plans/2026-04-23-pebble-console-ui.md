@@ -39,7 +39,7 @@ Edit `tests/ui/app.test.ts` so the first render test expects:
 
 ```ts
 expect(screen.getByRole('heading', { name: '猫语翻译器' })).toBeTruthy();
-expect(screen.getByText('nya58-zh2')).toBeTruthy();
+expect(screen.getByText('nya108-zh4')).toBeTruthy();
 expect(screen.getByText(/本地可逆编码/)).toBeTruthy();
 expect(screen.getByRole('heading', { name: '输入' })).toBeTruthy();
 expect(screen.getByRole('heading', { name: '输出' })).toBeTruthy();
@@ -48,7 +48,6 @@ expect(screen.getByRole('button', { name: '复制' })).toBeTruthy();
 expect(screen.getByRole('button', { name: '清空' })).toBeTruthy();
 expect(screen.getByRole('button', { name: '示例' })).toBeTruthy();
 expect(screen.getByText('codec')).toBeTruthy();
-expect(screen.getByText('rawLength')).toBeTruthy();
 expect(screen.getByText('tokenCount')).toBeTruthy();
 ```
 
@@ -105,11 +104,11 @@ root.innerHTML = `
         <span class="brand-mark" aria-hidden="true">nya</span>
         <div>
           <h1 id="app-title">猫语翻译器</h1>
-          <p>本地可逆编码，把 Unicode 文本转换成 nya58-zh2 猫语串。</p>
+          <p>本地可逆编码，把 Unicode 文本转换成 nya108-zh4 猫语串。</p>
         </div>
       </div>
       <div class="runtime-cluster" aria-live="polite">
-        <span class="protocol-chip">nya58-zh2</span>
+        <span class="protocol-chip">nya108-zh4</span>
         <span class="runtime-status" data-role="status">初始化中</span>
       </div>
     </header>
@@ -163,16 +162,12 @@ root.innerHTML = `
           <strong data-role="meta-codec">-</strong>
         </div>
         <div class="metric">
-          <span>rawLength</span>
-          <strong data-role="meta-raw-length">-</strong>
-        </div>
-        <div class="metric">
           <span>tokenCount</span>
           <strong data-role="meta-token-count">-</strong>
         </div>
         <details class="protocol-details">
           <summary>协议摘要</summary>
-          <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base58 digit -> 58-token 猫语表。</p>
+          <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base108 digit -> 108-token 猫语表。</p>
         </details>
       </section>
     </main>
@@ -182,22 +177,20 @@ root.innerHTML = `
 
 - [ ] **Step 5: Update DOM queries and meta rendering**
 
-In `src/ui/app.ts`, replace the old `meta` element query with three metric queries:
+In `src/ui/app.ts`, replace the old `meta` element query with two metric queries:
 
 ```ts
 const metaCodec = root.querySelector<HTMLElement>('[data-role="meta-codec"]');
-const metaRawLength = root.querySelector<HTMLElement>('[data-role="meta-raw-length"]');
 const metaTokenCount = root.querySelector<HTMLElement>('[data-role="meta-token-count"]');
 ```
 
-Update the null-check block to require `metaCodec`, `metaRawLength`, and `metaTokenCount` instead of `meta`.
+Update the null-check block to require `metaCodec` and `metaTokenCount` instead of `meta`.
 
 Replace `setMeta` with:
 
 ```ts
 const setMeta = (result: EncodeResult | DecodeResult | null) => {
   metaCodec.textContent = result ? codecName(result.meta.codec) : '-';
-  metaRawLength.textContent = result ? String(result.meta.rawLength) : '-';
   metaTokenCount.textContent = result ? String(result.meta.tokenCount) : '-';
 };
 ```
@@ -717,7 +710,7 @@ In the browser:
 1. Enter `你好，meow!`.
 2. Click `翻译`.
 3. Confirm output becomes a cat-language token string.
-4. Confirm `codec`, `rawLength`, and `tokenCount` update.
+4. Confirm `codec` and `tokenCount` update.
 5. Click `复制`.
 6. Confirm the button briefly changes to `已复制`.
 7. Switch to `猫语 -> 人话`.
@@ -764,4 +757,4 @@ Spec coverage:
 
 Placeholder scan: This plan intentionally contains no TBD/TODO/fill-in placeholders. The only optional path is verification-fix work that is explicitly gated on observed defects.
 
-Type consistency: The plan keeps `AppService`, `EncodeResult`, `DecodeResult`, `Direction`, `setError`, and `buttonPressed` unchanged. New DOM roles are `meta-codec`, `meta-raw-length`, and `meta-token-count`.
+Type consistency: The plan keeps `AppService`, `EncodeResult`, `DecodeResult`, `Direction`, `setError`, and `buttonPressed` unchanged. New DOM roles are `meta-codec` and `meta-token-count`.
