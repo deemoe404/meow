@@ -15,6 +15,7 @@
     "@bokuweb/zstd-wasm": "^0.0.27"
   },
   "devDependencies": {
+    "@rollup/wasm-node": "4.60.2",
     "@types/node": "^24.0.0",
     "jsdom": "^26.1.0",
     "typescript": "^5.8.3",
