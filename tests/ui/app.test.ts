@@ -55,7 +55,7 @@ describe('translator app', () => {
     expect(root.textContent).toContain('THE FELINE CONNECTION');
     expect(root.querySelector('[data-role="source-label"]')?.textContent).toBe('Chinese');
     expect(root.querySelector('[data-role="target-label"]')?.textContent).toBe('Cat');
-    expect(root.querySelector('[data-role="stitch-cat"]')?.getAttribute('src')).toBe('/stitch-cat.png');
+    expect(root.querySelector('[data-role="stitch-cat"]')?.getAttribute('src')).toBe('stitch-cat.png');
     expect(root.querySelector('[data-role="translate"]')?.getAttribute('aria-label')).toBe('翻译');
     expect(root.querySelector('[data-role="copy"]')?.getAttribute('aria-label')).toBe('复制');
     expect(root.querySelector('[data-role="clear"]')?.textContent).toBe('清空');
