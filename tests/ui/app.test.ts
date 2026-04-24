@@ -107,37 +107,101 @@ describe('translator app', () => {
     expect(root.textContent).not.toContain('payloadLength');
   });
 
+  it('fades existing output out before revealing translated replacement text', async () => {
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
+
+      let resolveEncode: ((value: Awaited<ReturnType<AppService['encode']>>) => void) | null = null;
+      const encode = vi.fn(
+        () =>
+          new Promise<Awaited<ReturnType<AppService['encode']>>>((resolve) => {
+            resolveEncode = resolve;
+          }),
+      );
+      await createTranslatorApp(root, createService({ encode }));
+
+      const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+      const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
+      const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+      input!.value = '你好，猫猫';
+      output!.value = 'old cat text';
+      translate!.click();
+      await flush();
+
+      expect(encode).toHaveBeenCalledWith('你好，猫猫');
+      expect(output!.value).toBe('old cat text');
+      expect(output!.classList.contains('is-output-replace-hiding')).toBe(true);
+
+      resolveEncode!({
+        cat: '！喵喵mewMEW',
+        meta: {
+          codec: 1,
+          tokenCount: 4,
+        },
+      });
+      await flush();
+      vi.advanceTimersByTime(160);
+      await flush();
+
+      expect(output!.value).toBe('！喵喵mewMEW');
+      expect(output!.classList.contains('is-output-replace-hiding')).toBe(false);
+      expect(output!.classList.contains('is-output-replace-revealing')).toBe(true);
+
+      vi.advanceTimersByTime(220);
+
+      expect(output!.classList.contains('is-output-replace-revealing')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('switches direction before translating and does not render uppercase mode controls', async () => {
-    const root = document.createElement('div');
-    document.body.append(root);
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
 
-    const decode = vi.fn(createService().decode);
-    await createTranslatorApp(root, createService({ decode }));
+      const decode = vi.fn(createService().decode);
+      await createTranslatorApp(root, createService({ decode }));
 
-    const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
-    const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
-    const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
-    const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+      const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+      const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
+      const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
+      const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
 
-    input!.value = '你好，猫猫';
-    output!.value = '！喵喵mewMEW';
-    reverse!.click();
-    expect(root.querySelector('.feline-app')?.classList.contains('is-cat-to-human')).toBe(true);
-    expect(root.querySelector('.feline-app')?.classList.contains('is-panel-swapping')).toBe(true);
-    expect(input!.readOnly).toBe(false);
-    expect(output!.readOnly).toBe(true);
-    expect(input!.value).toBe('！喵喵mewMEW');
-    expect(output!.value).toBe('你好，猫猫');
-    expect(input!.classList.contains('text-content--cat')).toBe(true);
-    expect(output!.classList.contains('text-content--chinese')).toBe(true);
-    input!.dispatchEvent(new Event('input', { bubbles: true }));
-    translate!.click();
-    await flush();
+      input!.value = '你好，猫猫';
+      output!.value = '！喵喵mewMEW';
+      reverse!.click();
+      expect(root.querySelector('.feline-app')?.classList.contains('is-cat-to-human')).toBe(true);
+      expect(root.querySelector('.feline-app')?.classList.contains('is-panel-swapping')).toBe(true);
+      expect(input!.readOnly).toBe(false);
+      expect(output!.readOnly).toBe(true);
+      expect(input!.value).toBe('！喵喵mewMEW');
+      expect(output!.value).toBe('你好，猫猫');
+      expect(input!.classList.contains('text-content--cat')).toBe(true);
+      expect(output!.classList.contains('text-content--chinese')).toBe(true);
 
-    expect(decode).toHaveBeenCalledWith('！喵喵mewMEW');
-    expect(output!.value).toBe('decoded:！喵喵mewMEW');
-    expect(root.querySelector('[data-role=\"upper-toggle\"]')).toBeNull();
-    expect(root.textContent).not.toContain('大写模式');
+      vi.advanceTimersByTime(740);
+
+      input!.dispatchEvent(new Event('input', { bubbles: true }));
+      translate!.click();
+      await flush();
+
+      expect(decode).toHaveBeenCalledWith('！喵喵mewMEW');
+      expect(output!.value).toBe('你好，猫猫');
+
+      vi.advanceTimersByTime(160);
+      await flush();
+
+      expect(output!.value).toBe('decoded:！喵喵mewMEW');
+      expect(root.querySelector('[data-role=\"upper-toggle\"]')).toBeNull();
+      expect(root.textContent).not.toContain('大写模式');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('renders two temporary text swap ghosts while switching filled panels', async () => {

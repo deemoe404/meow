@@ -210,6 +210,9 @@ export async function createTranslatorApp(
   let swapResetTimer: number | null = null;
   let textSwapResetTimer: number | null = null;
   let textSwapRevealTimer: number | null = null;
+  let outputReplaceHideTimer: number | null = null;
+  let outputReplaceRevealTimer: number | null = null;
+  let translateRunId = 0;
   translate.disabled = true;
 
   const prefersReducedMotion = () =>
@@ -241,6 +244,69 @@ export async function createTranslatorApp(
       output.classList.remove('is-text-swap-live-revealing');
       textSwapRevealTimer = null;
     }, 220);
+  };
+
+  const cleanupOutputReplaceTransition = () => {
+    if (outputReplaceHideTimer !== null) {
+      window.clearTimeout(outputReplaceHideTimer);
+      outputReplaceHideTimer = null;
+    }
+    if (outputReplaceRevealTimer !== null) {
+      window.clearTimeout(outputReplaceRevealTimer);
+      outputReplaceRevealTimer = null;
+    }
+    output.classList.remove('is-output-replace-hiding', 'is-output-replace-revealing');
+  };
+
+  const waitForOutputFadeOut = () =>
+    new Promise<void>((resolve) => {
+      outputReplaceHideTimer = window.setTimeout(() => {
+        outputReplaceHideTimer = null;
+        resolve();
+      }, 160);
+    });
+
+  const revealOutputReplacement = () => {
+    output.classList.remove('is-output-replace-hiding');
+    output.classList.add('is-output-replace-revealing');
+    outputReplaceRevealTimer = window.setTimeout(() => {
+      output.classList.remove('is-output-replace-revealing');
+      outputReplaceRevealTimer = null;
+    }, 220);
+  };
+
+  const beginOutputReplaceTransition = () => {
+    const shouldFadeOut = output.value.length > 0 && !prefersReducedMotion();
+
+    cleanupOutputReplaceTransition();
+
+    if (!shouldFadeOut) {
+      return null;
+    }
+
+    output.classList.add('is-output-replace-hiding');
+    return waitForOutputFadeOut();
+  };
+
+  const replaceOutputValue = async (
+    nextValue: string,
+    result: EncodeResult | DecodeResult | null,
+    runId: number,
+    fadeOut: Promise<void> | null,
+  ) => {
+    if (fadeOut) {
+      await fadeOut;
+    }
+    if (runId !== translateRunId) {
+      return;
+    }
+
+    output.value = nextValue;
+    setMeta(result);
+
+    if (!prefersReducedMotion()) {
+      revealOutputReplacement();
+    }
   };
 
   const createTextSwapGhost = (
@@ -393,22 +459,23 @@ export async function createTranslatorApp(
 
   const runTranslate = async () => {
     const source = input.value;
+    const runId = ++translateRunId;
+    const outputFadeOut = beginOutputReplaceTransition();
     setError(null);
 
     try {
       if (direction === 'human-to-cat') {
         const result = await service.encode(source);
-        output.value = result.cat;
-        setMeta(result);
+        await replaceOutputValue(result.cat, result, runId, outputFadeOut);
       } else {
         const result = await service.decode(source);
-        output.value = result.text;
-        setMeta(result);
+        await replaceOutputValue(result.text, result, runId, outputFadeOut);
       }
     } catch (err) {
-      output.value = '';
-      setMeta(null);
-      setError(err instanceof Error ? err.message : '翻译失败。');
+      await replaceOutputValue('', null, runId, outputFadeOut);
+      if (runId === translateRunId) {
+        setError(err instanceof Error ? err.message : '翻译失败。');
+      }
     }
   };
 

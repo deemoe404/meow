@@ -482,6 +482,14 @@ textarea.is-text-swap-live-revealing {
   animation: text-swap-live-reveal 220ms ease-out both;
 }
 
+textarea.is-output-replace-hiding {
+  animation: output-replace-hide 160ms ease-in both;
+}
+
+textarea.is-output-replace-revealing {
+  animation: output-replace-reveal 220ms ease-out both;
+}
+
 .text-swap-ghost {
   position: fixed;
   z-index: 20;
@@ -745,6 +753,26 @@ textarea[readonly]::placeholder {
 }
 
 @keyframes text-swap-live-reveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes output-replace-hide {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes output-replace-reveal {
   0% {
     opacity: 0;
   }
