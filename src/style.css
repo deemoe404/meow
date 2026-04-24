@@ -474,6 +474,31 @@ textarea {
   letter-spacing: 0;
 }
 
+textarea.is-text-swap-live-hidden {
+  opacity: 0;
+}
+
+textarea.is-text-swap-live-revealing {
+  animation: text-swap-live-reveal 220ms ease-out both;
+}
+
+.text-swap-ghost {
+  position: fixed;
+  z-index: 20;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  animation: text-swap-ghost-move 520ms cubic-bezier(0.18, 0.86, 0.24, 1) both;
+  will-change: transform, opacity;
+}
+
 .text-content--cat {
   font-family: "ZCOOL KuaiLe", "Plus Jakarta Sans", sans-serif;
   font-weight: 400;
@@ -695,6 +720,37 @@ textarea[readonly]::placeholder {
   100% {
     opacity: 1;
     transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes text-swap-ghost-move {
+  0% {
+    opacity: 0.92;
+    transform: translate(0, 0) scale(1);
+  }
+
+  66% {
+    opacity: 1;
+    transform: translate(
+        calc(var(--text-swap-x) * 1.015),
+        calc(var(--text-swap-y) * 1.015)
+      )
+      scale(1.01);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--text-swap-x), var(--text-swap-y)) scale(0.995);
+  }
+}
+
+@keyframes text-swap-live-reveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
   }
 }
 
