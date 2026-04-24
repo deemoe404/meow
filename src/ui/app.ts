@@ -208,11 +208,108 @@ export async function createTranslatorApp(
   let direction: Direction = 'human-to-cat';
   let copyResetTimer: number | null = null;
   let swapResetTimer: number | null = null;
+  let textSwapResetTimer: number | null = null;
+  let textSwapRevealTimer: number | null = null;
   translate.disabled = true;
+
+  const prefersReducedMotion = () =>
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+  const cleanupTextSwapGhosts = (revealLiveText = false) => {
+    if (textSwapResetTimer !== null) {
+      window.clearTimeout(textSwapResetTimer);
+      textSwapResetTimer = null;
+    }
+    if (textSwapRevealTimer !== null) {
+      window.clearTimeout(textSwapRevealTimer);
+      textSwapRevealTimer = null;
+    }
+    app.querySelectorAll('.text-swap-ghost').forEach((ghost) => ghost.remove());
+    input.classList.remove('is-text-swap-live-hidden');
+    output.classList.remove('is-text-swap-live-hidden');
+    input.classList.remove('is-text-swap-live-revealing');
+    output.classList.remove('is-text-swap-live-revealing');
+
+    if (!revealLiveText) {
+      return;
+    }
+
+    input.classList.add('is-text-swap-live-revealing');
+    output.classList.add('is-text-swap-live-revealing');
+    textSwapRevealTimer = window.setTimeout(() => {
+      input.classList.remove('is-text-swap-live-revealing');
+      output.classList.remove('is-text-swap-live-revealing');
+      textSwapRevealTimer = null;
+    }, 220);
+  };
+
+  const createTextSwapGhost = (
+    text: string,
+    contentClass: 'text-content--cat' | 'text-content--chinese',
+    from: DOMRect,
+    to: DOMRect,
+    source: HTMLTextAreaElement,
+  ) => {
+    const sourceStyle = window.getComputedStyle(source);
+    const ghost = document.createElement('div');
+    ghost.className = `text-swap-ghost ${contentClass}`;
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.dataset.role = 'text-swap-ghost';
+    ghost.textContent = text;
+    ghost.style.fontFamily = sourceStyle.fontFamily;
+    ghost.style.fontSize = sourceStyle.fontSize;
+    ghost.style.fontStyle = sourceStyle.fontStyle;
+    ghost.style.fontWeight = sourceStyle.fontWeight;
+    ghost.style.lineHeight = sourceStyle.lineHeight;
+    ghost.style.left = `${from.left}px`;
+    ghost.style.top = `${from.top}px`;
+    ghost.style.width = `${from.width}px`;
+    ghost.style.height = `${from.height}px`;
+    ghost.style.setProperty('--text-swap-x', `${to.left - from.left}px`);
+    ghost.style.setProperty('--text-swap-y', `${to.top - from.top}px`);
+    app.append(ghost);
+  };
+
+  const runTextSwapGhosts = (
+    previousInput: string,
+    previousOutput: string,
+    previousInputClass: 'text-content--cat' | 'text-content--chinese',
+    previousOutputClass: 'text-content--cat' | 'text-content--chinese',
+    inputBefore: DOMRect,
+    outputBefore: DOMRect,
+  ) => {
+    cleanupTextSwapGhosts();
+
+    if (prefersReducedMotion() || (!previousInput && !previousOutput)) {
+      return;
+    }
+
+    input.classList.add('is-text-swap-live-hidden');
+    output.classList.add('is-text-swap-live-hidden');
+
+    if (previousInput) {
+      createTextSwapGhost(previousInput, previousInputClass, inputBefore, outputBefore, input);
+    }
+    if (previousOutput) {
+      createTextSwapGhost(previousOutput, previousOutputClass, outputBefore, inputBefore, output);
+    }
+
+    textSwapResetTimer = window.setTimeout(() => cleanupTextSwapGhosts(true), 520);
+  };
 
   const animateSwap = (nextDirection: Direction) => {
     const sourceBefore = sourceLabel.getBoundingClientRect();
     const targetBefore = targetLabel.getBoundingClientRect();
+    const inputBefore = input.getBoundingClientRect();
+    const outputBefore = output.getBoundingClientRect();
+    const previousInput = input.value;
+    const previousOutput = output.value;
+    const previousInputClass = input.classList.contains('text-content--cat')
+      ? 'text-content--cat'
+      : 'text-content--chinese';
+    const previousOutputClass = output.classList.contains('text-content--cat')
+      ? 'text-content--cat'
+      : 'text-content--chinese';
 
     app.classList.remove(
       'is-panel-swapping',
@@ -227,12 +324,19 @@ export async function createTranslatorApp(
         : 'is-panel-swapping-to-cat',
     );
 
-    const previousInput = input.value;
     input.value = output.value;
     output.value = previousInput;
     updateInputCount();
 
     renderDirection();
+    runTextSwapGhosts(
+      previousInput,
+      previousOutput,
+      previousInputClass,
+      previousOutputClass,
+      inputBefore,
+      outputBefore,
+    );
 
     const sourceAfter = sourceLabel.getBoundingClientRect();
     const targetAfter = targetLabel.getBoundingClientRect();

@@ -140,6 +140,109 @@ describe('translator app', () => {
     expect(root.textContent).not.toContain('大写模式');
   });
 
+  it('renders two temporary text swap ghosts while switching filled panels', async () => {
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
+
+      await createTranslatorApp(root, createService());
+
+      const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+      const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
+      const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+      input!.value = '你好，猫猫';
+      output!.value = '！喵喵mewMEW';
+      reverse!.click();
+
+      const ghosts = root.querySelectorAll('[data-role="text-swap-ghost"]');
+      expect(ghosts).toHaveLength(2);
+      expect([...ghosts].map((ghost) => ghost.textContent)).toEqual([
+        '你好，猫猫',
+        '！喵喵mewMEW',
+      ]);
+      expect(ghosts[0]?.getAttribute('aria-hidden')).toBe('true');
+      expect(input!.classList.contains('is-text-swap-live-hidden')).toBe(true);
+      expect(output!.classList.contains('is-text-swap-live-hidden')).toBe(true);
+
+      vi.advanceTimersByTime(520);
+
+      expect(root.querySelectorAll('[data-role="text-swap-ghost"]')).toHaveLength(0);
+      expect(input!.classList.contains('is-text-swap-live-hidden')).toBe(false);
+      expect(output!.classList.contains('is-text-swap-live-hidden')).toBe(false);
+      expect(input!.classList.contains('is-text-swap-live-revealing')).toBe(true);
+      expect(output!.classList.contains('is-text-swap-live-revealing')).toBe(true);
+
+      vi.advanceTimersByTime(220);
+
+      expect(input!.classList.contains('is-text-swap-live-revealing')).toBe(false);
+      expect(output!.classList.contains('is-text-swap-live-revealing')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('renders only one text swap ghost when only one panel has text', async () => {
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
+
+      await createTranslatorApp(root, createService());
+
+      const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
+      const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+      output!.value = '！喵喵mewMEW';
+      reverse!.click();
+
+      const ghosts = root.querySelectorAll('[data-role="text-swap-ghost"]');
+      expect(ghosts).toHaveLength(1);
+      expect(ghosts[0]?.textContent).toBe('！喵喵mewMEW');
+
+      vi.advanceTimersByTime(740);
+
+      expect(root.querySelectorAll('[data-role="text-swap-ghost"]')).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('cleans up previous text swap ghosts during rapid direction switches', async () => {
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
+
+      await createTranslatorApp(root, createService());
+
+      const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+      const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
+      const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+      input!.value = '你好，猫猫';
+      output!.value = '！喵喵mewMEW';
+      reverse!.click();
+      expect(root.querySelectorAll('[data-role="text-swap-ghost"]')).toHaveLength(2);
+
+      reverse!.click();
+
+      const ghosts = root.querySelectorAll('[data-role="text-swap-ghost"]');
+      expect(ghosts).toHaveLength(2);
+      expect([...ghosts].map((ghost) => ghost.textContent)).toEqual([
+        '！喵喵mewMEW',
+        '你好，猫猫',
+      ]);
+
+      vi.advanceTimersByTime(740);
+
+      expect(root.querySelectorAll('[data-role="text-swap-ghost"]')).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('fills a random sample and copies the current output', async () => {
     const root = document.createElement('div');
     document.body.append(root);
