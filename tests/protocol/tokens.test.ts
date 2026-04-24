@@ -6,7 +6,7 @@ import {
   TOKEN_TABLE,
 } from '../../src/protocol/tokens';
 
-describe('nya108 token table', () => {
+describe('nya116 token table', () => {
   it('encodes and decodes deterministically across the full table', () => {
     const digits = Array.from({ length: TOKEN_TABLE.length }, (_, index) => index);
     const cat = encodeDigitsToCat(digits);
@@ -16,7 +16,7 @@ describe('nya108 token table', () => {
   });
 
   it('keeps token prefixes unambiguous for no-separator decoding', () => {
-    expect(TOKEN_TABLE).toHaveLength(108);
+    expect(TOKEN_TABLE).toHaveLength(116);
 
     for (const [leftIndex, left] of TOKEN_TABLE.entries()) {
       for (const [rightIndex, right] of TOKEN_TABLE.entries()) {
@@ -31,14 +31,14 @@ describe('nya108 token table', () => {
   });
 
   it('round-trips mixed punctuation, CJK, and ASCII tokens', () => {
-    const digits = [0, 1, 2, 9, 10, 11, 42, 57];
+    const digits = [0, 1, 2, 9, 10, 11, 42, 57, 108, 109, 110, 111, 112, 113, 114, 115];
     const cat = encodeDigitsToCat(digits);
 
-    expect(cat).toBe('！～喵喵咕噜mewMEWpurRRR');
+    expect(cat).toBe('！～喵喵咕噜mewMEWpurRRR…,，!~、？?');
     expect(decodeCatToDigits(cat)).toEqual(digits);
   });
 
-  it('exposes the expected 108-token values and ordering', () => {
+  it('exposes the expected 116-token values and ordering', () => {
     expect(TOKEN_TABLE).toEqual([
       '！', '～', '喵喵', '咪喵', '喵呜', '咪呜', '喵嗷', '咪嗷', '呼噜', '咕噜',
       'mew', 'MEW', 'meo', 'MEO', 'mia', 'MIA', 'mio', 'MIO', 'miu', 'MIU',
@@ -51,6 +51,7 @@ describe('nya108 token table', () => {
       '瞄嗷', '喵凹', '喵熬', '喵嚎', '喵奥', '喵敖', '眯嗷', '迷嗷', '咪凹', '咪熬',
       '咪嚎', '咪奥', '咪敖', '乎噜', '忽噜', '惚噜', '估噜', '姑噜', '菇噜', '箍噜',
       '嗷呜', '嗷乌', '嗷屋', '熬呜', '敖呜', '遨呜', '嗷唔', '嗷喔', '嗷喵', '咪咪喵',
+      '…', ',', '，', '!', '~', '、', '？', '?',
     ]);
   });
 
