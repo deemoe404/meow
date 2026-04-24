@@ -39,7 +39,7 @@ Edit `tests/ui/app.test.ts` so the first render test expects:
 
 ```ts
 expect(screen.getByRole('heading', { name: '猫语翻译器' })).toBeTruthy();
-expect(screen.getByText('nya108-zh4')).toBeTruthy();
+expect(screen.getByText('nya116-zh5')).toBeTruthy();
 expect(screen.getByText(/本地可逆编码/)).toBeTruthy();
 expect(screen.getByRole('heading', { name: '输入' })).toBeTruthy();
 expect(screen.getByRole('heading', { name: '输出' })).toBeTruthy();
@@ -104,11 +104,11 @@ root.innerHTML = `
         <span class="brand-mark" aria-hidden="true">nya</span>
         <div>
           <h1 id="app-title">猫语翻译器</h1>
-          <p>本地可逆编码，把 Unicode 文本转换成 nya108-zh4 猫语串。</p>
+          <p>本地可逆编码，把 Unicode 文本转换成 nya116-zh5 猫语串。</p>
         </div>
       </div>
       <div class="runtime-cluster" aria-live="polite">
-        <span class="protocol-chip">nya108-zh4</span>
+        <span class="protocol-chip">nya116-zh5</span>
         <span class="runtime-status" data-role="status">初始化中</span>
       </div>
     </header>
@@ -167,7 +167,7 @@ root.innerHTML = `
         </div>
         <details class="protocol-details">
           <summary>协议摘要</summary>
-          <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base108 digit -> 108-token 猫语表。</p>
+          <p>UTF-8 原文 -> raw/zstd-dict -> frame -> base116 digit -> 116-token 猫语表。</p>
         </details>
       </section>
     </main>
