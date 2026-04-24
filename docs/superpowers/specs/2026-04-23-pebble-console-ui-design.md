@@ -2,7 +2,7 @@
 
 ## Context
 
-The product is the `nya118-zh6` cat-language translator: a static browser app that reversibly encodes arbitrary Unicode text into a fixed 118-token cat-language protocol and decodes it back locally. The redesign should keep the app useful as a tool first. It should feel cartoon-cute and lightly Japanese, but still sparse, cold, and product-grade.
+The product is the `nya119-zh7` cat-language translator: a static browser app that reversibly encodes arbitrary Unicode text into a fixed 119-token cat-language protocol and decodes it back locally. The redesign should keep the app useful as a tool first. It should feel cartoon-cute and lightly Japanese, but still sparse, cold, and product-grade.
 
 The selected direction is **A. Pebble Console**.
 
@@ -30,7 +30,7 @@ Primary structure:
 The top bar should be quiet and functional:
 
 - `猫语翻译器` is the main label.
-- `nya118-zh6` appears as a protocol chip.
+- `nya119-zh7` appears as a protocol chip.
 - Runtime readiness appears as short utility text, for example `raw / zstd-dict ready`.
 
 Do not use a large cat illustration in the top bar. A small irregular brand mark or text glyph is acceptable if it does not compete with the workspace.

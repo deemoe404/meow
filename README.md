@@ -1,10 +1,10 @@
 # 猫语翻译器
 
-一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya118-zh6`。
+一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya119-zh7`。
 
 ## 特性
 
-- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base118 digit -> 118-token 猫语`
+- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base119 digit -> 119-token 猫语`
 - `raw` 与 `zstd-dict` 双 codec，编码时自动选择更短 payload
 - 浏览器本地编解码，无服务端依赖
 - 主线程 UI + Web Worker 协议内核，避免压缩和 wasm 初始化卡住页面
@@ -29,15 +29,15 @@ pnpm preview
 
 ## 协议说明
 
-`nya118-zh6` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。
+`nya119-zh7` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。
 
 编码流程：
 
 1. 文本按原样转成 UTF-8 字节
 2. 同时尝试 `raw` 与 `zstd-dict`
 3. 打包为极简 codec frame：首字节是 codec tag，剩余字节全部视为 payload
-4. codec frame 走无 padding 的 118 进制 digit 切片
-5. digit 直接映射到固定 118-token 猫语表，输出串中的每个 token 都承载 payload
+4. codec frame 走无 padding 的 119 进制 digit 切片
+5. digit 直接映射到固定 119-token 猫语表，输出串中的每个 token 都承载 payload
 
 协议内部的 `CodecId` 与 wire tag 分开表示：UI / meta 中的 codec id 使用 `0 raw`、`1 zstd-dict`；写入 codec frame 首字节的 wire tag 固定为：
 
@@ -62,7 +62,7 @@ pnpm preview
 78 瞄嗷 79 喵凹 80 喵熬 81 喵嚎 82 喵奥 83 喵敖 84 眯嗷 85 迷嗷 86 咪凹 87 咪熬
 88 咪嚎 89 咪奥 90 咪敖 91 乎噜 92 忽噜 93 惚噜 94 估噜 95 姑噜 96 菇噜 97 箍噜
 98 嗷呜 99 嗷乌 100 嗷屋 101 熬呜 102 敖呜 103 遨呜 104 嗷唔 105 嗷喔 106 嗷喵 107 咪咪喵
-108 … 109 , 110 ， 111 ! 112 ~ 113 、 114 ？ 115 ? 116 ... 117 。。。
+108 … 109 , 110 ， 111 ! 112 ~ 113 、 114 ？ 115 ? 116 ... 117 。。。 118 <space>
 ```
 
 ## 字典资产

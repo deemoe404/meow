@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createNya118Codec } from '../../src/protocol/nya118';
+import { createNya119Codec } from '../../src/protocol/nya119';
 import { decodeCatToDigits } from '../../src/protocol/tokens';
 import type { CompressionAdapter } from '../../src/protocol/types';
 
@@ -58,9 +58,9 @@ function createRawCompressionAdapter(): CompressionAdapter {
   };
 }
 
-describe('nya118 codec', () => {
+describe('nya119 codec', () => {
   it('round-trips mixed unicode text without normalization', async () => {
-    const codec = createNya118Codec(createCompressionAdapter());
+    const codec = createNya119Codec(createCompressionAdapter());
     const text = '喵！Hello～〜!😺\n第二行';
     const encoded = await codec.encode(text);
     const decoded = await codec.decode(encoded.cat);
@@ -71,21 +71,21 @@ describe('nya118 codec', () => {
   });
 
   it('selects zstd-dict when the adapter produces a shorter payload', async () => {
-    const codec = createNya118Codec(createCompressionAdapter());
+    const codec = createNya119Codec(createCompressionAdapter());
     const encoded = await codec.encode('这是一段会被字典压缩的文本');
 
     expect(encoded.meta.codec).toBe(1);
   });
 
   it('keeps raw when compression is not shorter', async () => {
-    const codec = createNya118Codec(createCompressionAdapter());
+    const codec = createNya119Codec(createCompressionAdapter());
     const encoded = await codec.encode('short');
 
     expect(encoded.meta.codec).toBe(0);
   });
 
   it('uses a one-byte codec frame for short raw text', async () => {
-    const codec = createNya118Codec(createRawCompressionAdapter());
+    const codec = createNya119Codec(createRawCompressionAdapter());
     const encoded = await codec.encode('你好');
     const decoded = await codec.decode(encoded.cat);
 
@@ -96,7 +96,7 @@ describe('nya118 codec', () => {
   });
 
   it('produces shorter output than the old nya32 encoding for fixed raw samples', async () => {
-    const codec = createNya118Codec(createRawCompressionAdapter());
+    const codec = createNya119Codec(createRawCompressionAdapter());
     const shortText = 'short';
     const longText = '在一个理想的猫语翻译器里，协议层和外观层必须明确分开。协议层负责把任意 Unicode 文本安全地转成 UTF-8 字节，再经过 raw 或 zstd-dict 选择、frame 打包、5-bit digit 切片和固定 token 表映射，最后得到一串可以公开传播的猫语。';
     const oldShortLength = 76;
