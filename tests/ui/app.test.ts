@@ -89,12 +89,16 @@ describe('translator app', () => {
     expect(root.querySelector('[data-role="tagline-cat"]')?.textContent).toBe('！喵喵mewMEW');
     expect(root.textContent).not.toContain('THE FELINE CONNECTION');
     expect(root.textContent).not.toContain('动态地用目前的翻译程序，把“人在说啥”翻译成猫语。');
-    expect(root.querySelector('[data-role="source-label"]')?.textContent).toBe('Chinese');
-    expect(root.querySelector('[data-role="target-label"]')?.textContent).toBe('Cat');
+    expect(root.querySelector('[data-role="source-label"]')?.textContent).toBe('人话');
+    expect(root.querySelector('[data-role="target-label"]')?.textContent).toBe('猫语');
     expect(root.querySelector('[data-role="source-label"]')?.classList.contains('language-pill--chinese')).toBe(true);
     expect(root.querySelector('[data-role="target-label"]')?.classList.contains('language-pill--cat')).toBe(true);
+    expect(root.querySelector<HTMLTextAreaElement>('[data-role="input"]')?.placeholder).toBe('输入要翻译的人话...');
+    expect(root.querySelector<HTMLTextAreaElement>('[data-role="output"]')?.placeholder).toBe('翻译后的猫语会出现在这里...');
     expect(root.querySelector('[data-role="stitch-cat"]')?.getAttribute('src')).toBe('stitch-cat.png');
     expect(root.querySelector('[data-role="translate"]')?.getAttribute('aria-label')).toBe('翻译');
+    expect(root.querySelector('.feline-app [data-role="translate"]')).toBeNull();
+    expect(root.querySelector('[data-role="translate"]')?.parentElement).toBe(root);
     expect(root.querySelector('[data-role="copy"]')?.getAttribute('aria-label')).toBe('复制');
     expect(root.querySelector('[data-role="clear"]')?.textContent).toBe('清空');
     expect(root.querySelector('[data-role="sample"]')?.textContent).toBe('示例');
@@ -296,6 +300,8 @@ describe('translator app', () => {
       expect(output!.value).toBe('你好，猫猫');
       expect(input!.classList.contains('text-content--cat')).toBe(true);
       expect(output!.classList.contains('text-content--chinese')).toBe(true);
+      expect(input!.placeholder).toBe('输入要翻译的猫语...');
+      expect(output!.placeholder).toBe('翻译后的人话会出现在这里...');
 
       vi.advanceTimersByTime(740);
 
