@@ -30,7 +30,15 @@ function buttonPressed(button: HTMLButtonElement, active: boolean): void {
 }
 
 function tokenDisplayValue(token: string): string {
-  return token === ' ' ? '空格 (" ")' : token;
+  if (token === ' ') {
+    return '空格 (" ")';
+  }
+
+  if (token === '\n') {
+    return '换行 ("\\n")';
+  }
+
+  return token;
 }
 
 type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share';

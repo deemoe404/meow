@@ -45,7 +45,7 @@ const EXPECTED_FACE_TOKENS = [
   '(•ᆺ•)',
 ] as const;
 
-describe('nya152 token table', () => {
+describe('nya155 token table', () => {
   it('encodes and decodes deterministically across the full table', () => {
     const digits = Array.from({ length: TOKEN_TABLE.length }, (_, index) => index);
     const cat = encodeDigitsToCat(digits);
@@ -55,7 +55,7 @@ describe('nya152 token table', () => {
   });
 
   it('keeps token prefixes unambiguous for no-separator decoding', () => {
-    expect(TOKEN_TABLE).toHaveLength(152);
+    expect(TOKEN_TABLE).toHaveLength(155);
 
     for (const [leftIndex, left] of TOKEN_TABLE.entries()) {
       for (const [rightIndex, right] of TOKEN_TABLE.entries()) {
@@ -77,8 +77,8 @@ describe('nya152 token table', () => {
     expect(decodeCatToDigits(cat)).toEqual(digits);
   });
 
-  it('exposes the expected 152-token values and ordering', () => {
-    expect(TOKEN_TABLE).toHaveLength(152);
+  it('exposes the expected 155-token values and ordering', () => {
+    expect(TOKEN_TABLE).toHaveLength(155);
     expect(TOKEN_TABLE.slice(0, 10)).toEqual([
       '！', '～', '喵喵', '咪喵', '喵呜', '咪呜', '喵嗷', '咪嗷', '呼噜', '咕噜',
     ]);
@@ -91,10 +91,19 @@ describe('nya152 token table', () => {
       '嗷呜', '嗷乌', '嗷屋', '熬呜', '敖呜', '遨呜', '嗷唔', '嗷喔', '嗷喵', '咪咪喵',
       '…', ',', '，', '!', '~', '、', '？', '?', '...', '。。。', ' ',
     ]);
-    expect(TOKEN_TABLE.slice(143)).toEqual(EXPECTED_FACE_TOKENS);
+    expect(TOKEN_TABLE.slice(143, 152)).toEqual(EXPECTED_FACE_TOKENS);
     expect(TOKEN_TABLE[151]).toBe('(•ᆺ•)');
+    expect(TOKEN_TABLE.slice(152)).toEqual(['\n', ';', '；']);
     expect(TOKEN_TABLE).not.toContain('(=^.^=)');
     expect(TOKEN_TABLE).not.toContain('（=^.^=）');
+  });
+
+  it('round-trips newline and semicolon tokens', () => {
+    const digits = [152, 153, 154];
+    const cat = encodeDigitsToCat(digits);
+
+    expect(cat).toBe('\n;；');
+    expect(decodeCatToDigits(cat)).toEqual(digits);
   });
 
   it('rejects unknown prefixes', () => {

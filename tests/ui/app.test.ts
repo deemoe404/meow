@@ -136,7 +136,9 @@ describe('translator app', () => {
     const items = root.querySelectorAll('[data-role="token-list-item"]');
     const firstItem = root.querySelector<HTMLElement>('[data-token-index="0"]');
     const spaceIndex = TOKEN_TABLE.indexOf(' ');
+    const newlineIndex = TOKEN_TABLE.indexOf('\n');
     const spaceItem = root.querySelector<HTMLElement>(`[data-token-index="${spaceIndex}"]`);
+    const newlineItem = root.querySelector<HTMLElement>(`[data-token-index="${newlineIndex}"]`);
     const lastItem = root.querySelector<HTMLElement>(`[data-token-index="${TOKEN_TABLE.length - 1}"]`);
 
     expect(trigger!.getAttribute('aria-expanded')).toBe('true');
@@ -149,6 +151,8 @@ describe('translator app', () => {
     expect(firstItem?.textContent).toContain(TOKEN_TABLE[0]);
     expect(spaceItem?.textContent).toContain(String(spaceIndex));
     expect(spaceItem?.textContent).toContain('空格 (" ")');
+    expect(newlineItem?.textContent).toContain(String(newlineIndex));
+    expect(newlineItem?.textContent).toContain('换行 ("\\n")');
     expect(lastItem?.textContent).toContain(String(TOKEN_TABLE.length - 1));
     expect(lastItem?.textContent).toContain(TOKEN_TABLE[TOKEN_TABLE.length - 1]);
   });
