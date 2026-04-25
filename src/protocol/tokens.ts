@@ -23,6 +23,8 @@ export const TOKEN_TABLE = [
 ] as const;
 
 const ASCII_SUFFIX_TOKENS = [',', '!', '~', '?', ';'] as const;
+const EXPANDED_PUNCTUATION_TOKENS = ['!', '?'] as const;
+const MAX_EXPANDED_PUNCTUATION_LENGTH = 4;
 
 function isExpandableToken(token: string): boolean {
   return /^[\p{Script=Han}]+$/u.test(token) || /^[A-Za-z]+$/.test(token);
@@ -32,17 +34,36 @@ function isRemovedAsciiSuffixToken(token: string): boolean {
   return ASCII_SUFFIX_TOKENS.includes(token as typeof ASCII_SUFFIX_TOKENS[number]);
 }
 
+function buildPunctuationSequences(
+  alphabet: readonly string[],
+  maxLength: number,
+): string[] {
+  let current = [''];
+  const sequences: string[] = [];
+
+  for (let length = 1; length <= maxLength; length += 1) {
+    current = current.flatMap((prefix) => alphabet.map((token) => `${prefix}${token}`));
+    sequences.push(...current);
+  }
+
+  return sequences;
+}
+
 function buildExpandedTokenTable(source: readonly string[]): readonly string[] {
   const expandableTokens = source.filter(isExpandableToken);
-  const asciiSuffixedTokens = expandableTokens
-    .flatMap((token) => ASCII_SUFFIX_TOKENS.map((suffix) => `${token}${suffix}`));
+  const punctuationSequences = buildPunctuationSequences(
+    EXPANDED_PUNCTUATION_TOKENS,
+    MAX_EXPANDED_PUNCTUATION_LENGTH,
+  );
+  const punctuatedTokens = expandableTokens
+    .flatMap((token) => punctuationSequences.map((suffix) => `${token}${suffix}`));
   const spaceSuffixedTokens = [
     ...expandableTokens.map((token) => `${token} `),
-    ...asciiSuffixedTokens.map((token) => `${token} `),
+    ...punctuatedTokens.map((token) => `${token} `),
   ];
   const retainedTokens = source.filter((token) => !isRemovedAsciiSuffixToken(token) && token !== ' ');
 
-  return [...retainedTokens, ...asciiSuffixedTokens, ...spaceSuffixedTokens];
+  return [...retainedTokens, ...punctuatedTokens, ...spaceSuffixedTokens];
 }
 
 function buildTokensByLength(table: readonly string[]): { token: string; index: number }[] {
