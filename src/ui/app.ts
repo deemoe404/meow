@@ -1,7 +1,9 @@
+import { TOKEN_TABLE } from '../protocol/tokens';
 import type { EncodeResult, DecodeResult } from '../protocol/types';
 import type { WorkerReadyResult } from '../worker/messages';
 
 type Direction = 'human-to-cat' | 'cat-to-human';
+const TOKEN_VOCABULARY_CLOSE_MS = 220;
 
 export interface AppService {
   ready(): Promise<WorkerReadyResult>;
@@ -24,6 +26,10 @@ function codecName(codec: number): string {
 function buttonPressed(button: HTMLButtonElement, active: boolean): void {
   button.setAttribute('aria-pressed', active ? 'true' : 'false');
   button.classList.toggle('is-active', active);
+}
+
+function tokenDisplayValue(token: string): string {
+  return token === ' ' ? '空格 (" ")' : token;
 }
 
 type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share';
@@ -81,6 +87,18 @@ export async function createTranslatorApp(
       <div class="feline-pattern" aria-hidden="true"></div>
       <div class="ambient ambient--sun" aria-hidden="true"></div>
       <div class="ambient ambient--sand" aria-hidden="true"></div>
+
+      <button
+        class="token-vocabulary-trigger"
+        type="button"
+        data-role="token-vocabulary-trigger"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-label="查看当前词表，共 ${TOKEN_TABLE.length} 个 token"
+      >
+        <span>词表</span>
+        <strong>${TOKEN_TABLE.length}</strong>
+      </button>
 
       <header class="hero">
         <div class="hero-inner">
@@ -183,6 +201,9 @@ export async function createTranslatorApp(
   const metaCodec = root.querySelector<HTMLElement>('[data-role="meta-codec"]');
   const metaTokenCount = root.querySelector<HTMLElement>('[data-role="meta-token-count"]');
   const inputCount = root.querySelector<HTMLElement>('[data-role="input-count"]');
+  const tokenVocabularyTrigger = root.querySelector<HTMLButtonElement>(
+    '[data-role="token-vocabulary-trigger"]',
+  );
   const app = root.querySelector<HTMLElement>('.feline-app');
 
   if (
@@ -200,7 +221,8 @@ export async function createTranslatorApp(
     !error ||
     !metaCodec ||
     !metaTokenCount ||
-    !inputCount
+    !inputCount ||
+    !tokenVocabularyTrigger
   ) {
     throw new Error('app DOM 初始化失败');
   }
@@ -212,6 +234,8 @@ export async function createTranslatorApp(
   let textSwapRevealTimer: number | null = null;
   let outputReplaceHideTimer: number | null = null;
   let outputReplaceRevealTimer: number | null = null;
+  let tokenVocabularyOverlay: HTMLElement | null = null;
+  let tokenVocabularyCloseTimer: number | null = null;
   let translateRunId = 0;
   translate.disabled = true;
 
@@ -256,6 +280,122 @@ export async function createTranslatorApp(
       outputReplaceRevealTimer = null;
     }
     output.classList.remove('is-output-replace-hiding', 'is-output-replace-revealing');
+  };
+
+  const closeTokenVocabularyDialog = (restoreFocus = true) => {
+    if (!tokenVocabularyOverlay) {
+      return;
+    }
+    if (tokenVocabularyCloseTimer !== null) {
+      return;
+    }
+
+    const overlay = tokenVocabularyOverlay;
+    overlay.classList.add('is-closing');
+    tokenVocabularyTrigger.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('keydown', handleTokenVocabularyKeydown);
+
+    tokenVocabularyCloseTimer = window.setTimeout(
+      () => {
+        overlay.remove();
+        if (tokenVocabularyOverlay === overlay) {
+          tokenVocabularyOverlay = null;
+        }
+        tokenVocabularyCloseTimer = null;
+
+        if (restoreFocus) {
+          tokenVocabularyTrigger.focus();
+        }
+      },
+      prefersReducedMotion() ? 1 : TOKEN_VOCABULARY_CLOSE_MS,
+    );
+  };
+
+  const buildTokenVocabularyDialog = () => {
+    const overlay = document.createElement('div');
+    overlay.className = 'token-vocabulary-overlay';
+    overlay.dataset.role = 'token-vocabulary-overlay';
+
+    const dialog = document.createElement('section');
+    dialog.className = 'token-vocabulary-dialog';
+    dialog.dataset.role = 'token-vocabulary-dialog';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', 'token-vocabulary-title');
+
+    const header = document.createElement('div');
+    header.className = 'token-vocabulary-header';
+
+    const title = document.createElement('h2');
+    title.id = 'token-vocabulary-title';
+    title.textContent = `当前词表 / ${TOKEN_TABLE.length} tokens`;
+
+    const close = document.createElement('button');
+    close.className = 'token-vocabulary-close';
+    close.type = 'button';
+    close.dataset.role = 'token-vocabulary-close';
+    close.setAttribute('aria-label', '关闭词表');
+    close.textContent = '关闭';
+    close.addEventListener('click', () => closeTokenVocabularyDialog());
+
+    header.append(title, close);
+
+    const list = document.createElement('div');
+    list.className = 'token-vocabulary-list';
+    list.dataset.role = 'token-vocabulary-list';
+    list.setAttribute('role', 'list');
+
+    TOKEN_TABLE.forEach((token, index) => {
+      const item = document.createElement('div');
+      item.className = 'token-vocabulary-item';
+      item.dataset.role = 'token-list-item';
+      item.dataset.tokenIndex = String(index);
+      item.setAttribute('role', 'listitem');
+
+      const indexLabel = document.createElement('span');
+      indexLabel.className = 'token-vocabulary-index';
+      indexLabel.textContent = String(index);
+
+      const value = document.createElement('span');
+      value.className = 'token-vocabulary-value';
+      value.textContent = tokenDisplayValue(token);
+
+      item.append(indexLabel, value);
+      list.append(item);
+    });
+
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) {
+        closeTokenVocabularyDialog();
+      }
+    });
+
+    dialog.append(header, list);
+    overlay.append(dialog);
+
+    return {
+      overlay,
+      close,
+    };
+  };
+
+  function handleTokenVocabularyKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      closeTokenVocabularyDialog();
+    }
+  }
+
+  const openTokenVocabularyDialog = () => {
+    if (tokenVocabularyOverlay) {
+      return;
+    }
+
+    const { overlay, close } = buildTokenVocabularyDialog();
+    tokenVocabularyOverlay = overlay;
+    tokenVocabularyTrigger.setAttribute('aria-expanded', 'true');
+    app.append(overlay);
+    document.addEventListener('keydown', handleTokenVocabularyKeydown);
+    close.focus();
   };
 
   const waitForOutputFadeOut = () =>
@@ -504,6 +644,8 @@ export async function createTranslatorApp(
   });
 
   input.addEventListener('input', updateInputCount);
+
+  tokenVocabularyTrigger.addEventListener('click', openTokenVocabularyDialog);
 
   translate.addEventListener('click', () => {
     void runTranslate();

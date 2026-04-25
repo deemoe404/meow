@@ -143,6 +143,166 @@ textarea:focus-visible {
   border-radius: 50% 40% 65% 35% / 42% 58% 38% 62%;
 }
 
+.token-vocabulary-trigger {
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top));
+  right: 24px;
+  z-index: 32;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 17px;
+  border: 1px solid rgba(244, 162, 97, 0.18);
+  color: var(--primary-ink);
+  background: rgba(255, 255, 255, 0.84);
+  border-radius: 70% 30% 60% 40% / 40% 60% 30% 70%;
+  box-shadow: 0 8px 24px rgba(38, 70, 83, 0.08);
+  backdrop-filter: blur(12px);
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.token-vocabulary-trigger:hover {
+  background: rgba(255, 250, 244, 0.94);
+  box-shadow: 0 12px 32px rgba(38, 70, 83, 0.12);
+  transform: translateY(-1px);
+}
+
+.token-vocabulary-trigger span {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.token-vocabulary-trigger strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.token-vocabulary-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(38, 70, 83, 0.36);
+  animation: vocabulary-overlay-enter 120ms ease both;
+}
+
+.token-vocabulary-dialog {
+  display: flex;
+  width: min(760px, 100%);
+  max-height: min(720px, calc(100svh - 48px));
+  flex-direction: column;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  background:
+    linear-gradient(180deg, rgba(244, 162, 97, 0.06), transparent 160px),
+    var(--surface);
+  border-radius: 38px;
+  box-shadow: 0 24px 80px rgba(38, 70, 83, 0.22);
+  transform-origin: 42% 68%;
+  animation: vocabulary-dialog-enter 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  contain: layout paint;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.token-vocabulary-overlay.is-closing {
+  pointer-events: none;
+  animation: vocabulary-overlay-exit 220ms ease both;
+}
+
+.token-vocabulary-overlay.is-closing .token-vocabulary-dialog {
+  animation: vocabulary-dialog-exit 220ms cubic-bezier(0.42, 0, 0.72, 0.58) both;
+}
+
+.token-vocabulary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 26px 18px;
+  border-bottom: 1px solid rgba(233, 196, 106, 0.24);
+}
+
+.token-vocabulary-header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.token-vocabulary-close {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 15px;
+  color: var(--ink);
+  background: rgba(233, 196, 106, 0.18);
+  border-radius: 30% 70% 40% 60% / 60% 40% 70% 30%;
+  font-size: 13px;
+  font-weight: 800;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.token-vocabulary-close:hover {
+  background: rgba(233, 196, 106, 0.28);
+  transform: translateY(-1px);
+}
+
+.token-vocabulary-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 0;
+  min-height: 0;
+  padding: 8px 26px 18px;
+  overflow: auto;
+}
+
+.token-vocabulary-item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(233, 196, 106, 0.24);
+}
+
+.token-vocabulary-item:last-child {
+  border-bottom: 0;
+}
+
+.token-vocabulary-index {
+  color: rgba(38, 70, 83, 0.46);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.token-vocabulary-value {
+  min-width: 0;
+  color: var(--ink);
+  font-family: "ZCOOL KuaiLe", "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
 .hero {
   width: 100%;
   padding: clamp(36px, 5vh, 58px) 24px clamp(22px, 3.4vh, 34px) clamp(56px, 5.5vw, 76px);
@@ -782,6 +942,50 @@ textarea[readonly]::placeholder {
   }
 }
 
+@keyframes vocabulary-overlay-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vocabulary-dialog-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(-10px, calc(50svh + 56px), 0) rotate(-6deg) scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes vocabulary-overlay-exit {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vocabulary-dialog-exit {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(-10px, calc(50svh + 56px), 0) rotate(-8deg) scale(0.9);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -794,6 +998,11 @@ textarea[readonly]::placeholder {
 }
 
 @media (max-width: 960px) {
+  .token-vocabulary-trigger {
+    top: max(14px, env(safe-area-inset-top));
+    right: 18px;
+  }
+
   .hero {
     padding: 46px 22px 28px;
   }
@@ -868,6 +1077,66 @@ textarea[readonly]::placeholder {
     height: 100svh;
     min-height: 100svh;
     flex-direction: column;
+  }
+
+  .token-vocabulary-trigger {
+    top: max(10px, env(safe-area-inset-top));
+    right: 10px;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 12px;
+  }
+
+  .token-vocabulary-trigger span {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .token-vocabulary-trigger strong {
+    font-size: 15px;
+  }
+
+  .token-vocabulary-overlay {
+    align-items: start;
+    padding: calc(54px + env(safe-area-inset-top)) 10px calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .token-vocabulary-dialog {
+    max-height: calc(100svh - 132px - env(safe-area-inset-bottom));
+    border-width: 2px;
+    border-radius: 24px;
+  }
+
+  .token-vocabulary-header {
+    gap: 12px;
+    padding: 16px 15px 12px;
+  }
+
+  .token-vocabulary-header h2 {
+    font-size: 1.08rem;
+  }
+
+  .token-vocabulary-close {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .token-vocabulary-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+    row-gap: 0;
+    padding: 4px 15px 12px;
+  }
+
+  .token-vocabulary-item {
+    grid-template-columns: 42px minmax(0, 1fr);
+    min-height: 38px;
+    padding: 7px 0;
+  }
+
+  .token-vocabulary-value {
+    font-size: 15px;
   }
 
   .hero {
