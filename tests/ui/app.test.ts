@@ -522,7 +522,7 @@ describe('translator app', () => {
     document.body.append(root);
 
     const encode = vi.fn(async (_text: string, vocabulary = 'default') => ({
-      cat: vocabulary === 'expanded' ? 'mew!喵喵?' : '！喵喵mewMEW',
+      cat: vocabulary === 'expanded' ? 'mew! 喵喵? ' : '！喵喵mewMEW',
       meta: {
         codec: 1 as const,
         tokenCount: vocabulary === 'expanded' ? 2 : 4,
@@ -540,6 +540,8 @@ describe('translator app', () => {
 
     expect(toggle).not.toBeNull();
     expect(trigger).not.toBeNull();
+    expect(toggle!.textContent).toContain('1568');
+    expect(toggle!.getAttribute('aria-label')).toContain('1568');
     expect(toggle!.getAttribute('aria-checked')).toBe('false');
     expect(trigger!.textContent).toContain(String(TOKEN_TABLE.length));
 
@@ -555,17 +557,17 @@ describe('translator app', () => {
     await flush();
 
     expect(encode).toHaveBeenLastCalledWith('你好，猫猫', 'expanded');
-    expect(root.querySelector<HTMLTextAreaElement>('[data-role="output"]')!.value).toBe('mew!喵喵?');
+    expect(root.querySelector<HTMLTextAreaElement>('[data-role="output"]')!.value).toBe('mew! 喵喵? ');
 
     trigger!.click();
 
     const dialog = root.querySelector<HTMLElement>('[data-role="token-vocabulary-dialog"]');
     const items = root.querySelectorAll('[data-role="token-list-item"]');
-    const expandedTokenIndex = EXPANDED_TOKEN_TABLE.indexOf('mew!');
+    const expandedTokenIndex = EXPANDED_TOKEN_TABLE.indexOf('mew! ');
     const expandedToken = root.querySelector<HTMLElement>(`[data-token-index="${expandedTokenIndex}"]`);
 
     expect(dialog?.textContent).toContain(`当前词表 / ${EXPANDED_TOKEN_TABLE.length} tokens`);
     expect(items).toHaveLength(EXPANDED_TOKEN_TABLE.length);
-    expect(expandedToken?.textContent).toContain('mew!');
+    expect(expandedToken?.textContent).toContain('mew! ');
   });
 });

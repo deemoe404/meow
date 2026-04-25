@@ -33,12 +33,16 @@ function isRemovedAsciiSuffixToken(token: string): boolean {
 }
 
 function buildExpandedTokenTable(source: readonly string[]): readonly string[] {
-  const retainedTokens = source.filter((token) => !isRemovedAsciiSuffixToken(token));
-  const suffixedTokens = source
-    .filter(isExpandableToken)
+  const expandableTokens = source.filter(isExpandableToken);
+  const asciiSuffixedTokens = expandableTokens
     .flatMap((token) => ASCII_SUFFIX_TOKENS.map((suffix) => `${token}${suffix}`));
+  const spaceSuffixedTokens = [
+    ...expandableTokens.map((token) => `${token} `),
+    ...asciiSuffixedTokens.map((token) => `${token} `),
+  ];
+  const retainedTokens = source.filter((token) => !isRemovedAsciiSuffixToken(token) && token !== ' ');
 
-  return [...retainedTokens, ...suffixedTokens];
+  return [...retainedTokens, ...asciiSuffixedTokens, ...spaceSuffixedTokens];
 }
 
 function buildTokensByLength(table: readonly string[]): { token: string; index: number }[] {
