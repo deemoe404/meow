@@ -107,13 +107,13 @@ export async function createTranslatorApp(
           type="button"
           role="switch"
           aria-checked="false"
-          aria-label="启用 795 token 词表"
+          aria-label="启用 ${getVocabularySize('expanded')} token 词表"
           data-role="expanded-vocabulary-toggle"
         >
           <span class="expanded-vocabulary-toggle-track" aria-hidden="true">
             <span class="expanded-vocabulary-toggle-thumb"></span>
           </span>
-          <strong>795</strong>
+          <strong>${getVocabularySize('expanded')}</strong>
         </button>
 
         <button

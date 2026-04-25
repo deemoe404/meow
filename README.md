@@ -1,12 +1,12 @@
 # 猫语翻译器
 
-一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya155-zh11`，并支持可选 795-token 词表。
+一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya155-zh11`，并支持可选 1568-token 词表。
 
 ## 特性
 
 - 任意 Unicode 文本 `-> UTF-8 -> codec frame -> baseN digit -> 猫语 token`
 - `raw` 与 `zstd-dict` 双 codec，编码时自动选择更短 payload
-- 默认 155-token 词表，也可在页面右上角切换到 795-token 扩展词表
+- 默认 155-token 词表，也可在页面右上角切换到 1568-token 扩展词表
 - 浏览器本地编解码，无服务端依赖
 - 主线程 UI + Web Worker 协议内核，避免压缩和 wasm 初始化卡住页面
 - 中文主文案、简化版猫系视觉、支持 GitHub Pages 相对路径部署
@@ -43,7 +43,7 @@ pnpm run assets:social
 1. 文本按原样转成 UTF-8 字节
 2. 同时尝试 `raw` 与 `zstd-dict`
 3. 打包为极简 codec frame：首字节是 codec tag，剩余字节全部视为 payload
-4. codec frame 走无 padding 的 N 进制 digit 切片：默认词表使用 base155，扩展词表使用 base795
+4. codec frame 走无 padding 的 N 进制 digit 切片：默认词表使用 base155，扩展词表使用 base1568
 5. digit 直接映射到当前词表，输出串中的每个 token 都承载 payload
 
 协议内部的 `CodecId` 与 wire tag 分开表示：UI / meta 中的 codec id 使用 `0 raw`、`1 zstd-dict`；写入 codec frame 首字节的 wire tag 固定为：
@@ -79,13 +79,14 @@ pnpm run assets:social
 
 其中 `<newline>` 表示 U+000A 换行符 `\n`，`<space>` 表示 U+0020 空格。
 
-扩展 795-token 词表不会替换默认词表；它只在页面右上角开关打开时使用。生成规则是：
+扩展 1568-token 词表不会替换默认词表；它只在页面右上角开关打开时使用。生成规则是：
 
-1. 从默认词表移除 5 个单个 ASCII 标点 token：`,`、`!`、`~`、`?`、`;`
+1. 从默认词表移除 5 个单个 ASCII 标点 token：`,`、`!`、`~`、`?`、`;`，并移除独立空格 token
 2. 保留默认词表里其余 token
 3. 对默认词表中的 57 个纯汉字 token 和 72 个纯英文字母 token，各追加上述 5 个 ASCII 后缀，新增 `129 * 5 = 645` 个 token
+4. 对上述 129 个纯汉字/英文字母 token 追加空格，新增 `129` 个 token；再对 645 个 ASCII 后缀 token 追加空格，新增 `645` 个 token
 
-因此扩展词表总数为 `155 - 5 + 645 = 795`。扩展词表中 `mew!` 这类 token 会和 `mew` 形成前缀关系，解码器用最长匹配规则解析。
+因此扩展词表总数为 `155 - 5 - 1 + 645 + 129 + 645 = 1568`。扩展词表中 `mew!`、`mew! ` 这类 token 会和 `mew` 形成前缀关系，解码器用最长匹配规则解析。
 
 ## 字典资产
 
