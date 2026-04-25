@@ -123,7 +123,7 @@ func drawDotPattern(width: CGFloat, height: CGFloat) {
 }
 
 func drawSocialPreview() throws {
-  try savePNG(width: 1200, height: 630, to: publicDir.appendingPathComponent("og-image.png")) {
+  try savePNG(width: 1200, height: 630, to: publicDir.appendingPathComponent("og-image-v2.png")) {
     width,
     height in
     NSColor(hex: 0xfcfbf9).setFill()
@@ -131,80 +131,48 @@ func drawSocialPreview() throws {
     drawDotPattern(width: width, height: height)
 
     fillRounded(
-      topRect(x: 690, y: 62, width: 390, height: 468, canvasHeight: height),
-      radius: 64,
-      color: NSColor(hex: 0xffd4dd, alpha: 0.42)
+      topRect(x: 628, y: 44, width: 486, height: 522, canvasHeight: height),
+      radius: 76,
+      color: NSColor(hex: 0xffd4dd, alpha: 0.46)
     )
     fillRounded(
-      topRect(x: 640, y: 92, width: 490, height: 452, canvasHeight: height),
-      radius: 48,
+      topRect(x: 592, y: 70, width: 548, height: 488, canvasHeight: height),
+      radius: 58,
       color: NSColor(hex: 0xffffff, alpha: 0.9)
     )
-    drawCat(in: topRect(x: 666, y: 116, width: 438, height: 404, canvasHeight: height), cornerRadius: 40)
+    drawCat(in: topRect(x: 614, y: 88, width: 508, height: 452, canvasHeight: height), cornerRadius: 50)
     strokeRounded(
-      topRect(x: 640, y: 92, width: 490, height: 452, canvasHeight: height),
-      radius: 48,
-      color: NSColor(hex: 0xf4a261, alpha: 0.28),
-      width: 2
-    )
-
-    fillRounded(
-      topRect(x: 80, y: 82, width: 186, height: 44, canvasHeight: height),
-      radius: 22,
-      color: NSColor(hex: 0xfff1dd)
-    )
-    drawText(
-      "meow.dee.moe",
-      in: topRect(x: 102, y: 92, width: 160, height: 28, canvasHeight: height),
-      font: NSFont.systemFont(ofSize: 20, weight: .bold),
-      color: NSColor(hex: 0x6f3800)
+      topRect(x: 592, y: 70, width: 548, height: 488, canvasHeight: height),
+      radius: 58,
+      color: NSColor(hex: 0xf4a261, alpha: 0.25),
+      width: 3
     )
 
     drawText(
       "喵在说啥",
-      in: topRect(x: 78, y: 158, width: 520, height: 110, canvasHeight: height),
-      font: NSFont.systemFont(ofSize: 82, weight: .heavy),
+      in: topRect(x: 72, y: 132, width: 520, height: 142, canvasHeight: height),
+      font: NSFont.systemFont(ofSize: 116, weight: .heavy),
       color: NSColor(hex: 0x264653),
-      lineHeight: 92
+      lineHeight: 128
     )
     drawText(
-      "人话 ⇄ 猫语，可逆翻译器",
-      in: topRect(x: 84, y: 282, width: 520, height: 48, canvasHeight: height),
-      font: NSFont.systemFont(ofSize: 34, weight: .semibold),
+      "可逆猫语翻译器",
+      in: topRect(x: 82, y: 302, width: 500, height: 70, canvasHeight: height),
+      font: NSFont.systemFont(ofSize: 54, weight: .bold),
       color: NSColor(hex: 0x2a6f60),
-      lineHeight: 42
+      lineHeight: 62
     )
 
-    let samplePanel = topRect(x: 82, y: 384, width: 510, height: 112, canvasHeight: height)
-    fillRounded(samplePanel, radius: 28, color: NSColor(hex: 0xffffff, alpha: 0.92))
-    strokeRounded(samplePanel, radius: 28, color: NSColor(hex: 0xe9c46a, alpha: 0.36), width: 2)
+    let directionPill = topRect(x: 84, y: 428, width: 394, height: 78, canvasHeight: height)
+    fillRounded(directionPill, radius: 39, color: NSColor(hex: 0xfff1dd))
+    strokeRounded(directionPill, radius: 39, color: NSColor(hex: 0xe9c46a, alpha: 0.45), width: 2)
     drawText(
-      "把一句话变成可复制、可分享、可还原的猫语。",
-      in: topRect(x: 112, y: 410, width: 456, height: 34, canvasHeight: height),
-      font: NSFont.systemFont(ofSize: 24, weight: .semibold),
-      color: NSColor(hex: 0x264653),
-      lineHeight: 30
-    )
-    drawText(
-      "喵 嗷 呜 叭 呼 咕...",
-      in: topRect(x: 112, y: 456, width: 456, height: 30, canvasHeight: height),
-      font: NSFont.systemFont(ofSize: 22, weight: .bold),
-      color: NSColor(hex: 0xf26d7d),
-      lineHeight: 28
-    )
-
-    drawText(
-      "nya128-zh9",
-      in: topRect(x: 84, y: 546, width: 180, height: 26, canvasHeight: height),
-      font: NSFont.monospacedSystemFont(ofSize: 18, weight: .semibold),
-      color: NSColor(hex: 0x264653, alpha: 0.58)
-    )
-    drawText(
-      "open the translator",
-      in: topRect(x: 328, y: 546, width: 260, height: 26, canvasHeight: height),
-      font: NSFont.systemFont(ofSize: 18, weight: .semibold),
-      color: NSColor(hex: 0x264653, alpha: 0.5),
-      alignment: .right
+      "人话 ⇄ 猫语",
+      in: topRect(x: 118, y: 445, width: 326, height: 44, canvasHeight: height),
+      font: NSFont.systemFont(ofSize: 38, weight: .heavy),
+      color: NSColor(hex: 0x6f3800),
+      alignment: .center,
+      lineHeight: 44
     )
   }
 }

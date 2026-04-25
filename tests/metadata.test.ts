@@ -50,7 +50,7 @@ describe('site metadata', () => {
     expect(meta(document, 'og:description')).toBe(
       '把人话变成可复制、可还原的猫语，也能一键翻回来。',
     );
-    expect(meta(document, 'og:image')).toBe('https://meow.dee.moe/og-image.png');
+    expect(meta(document, 'og:image')).toBe('https://meow.dee.moe/og-image-v2.png');
     expect(meta(document, 'og:image:type')).toBe('image/png');
     expect(meta(document, 'og:image:width')).toBe('1200');
     expect(meta(document, 'og:image:height')).toBe('630');
@@ -60,12 +60,12 @@ describe('site metadata', () => {
     expect(meta(document, 'twitter:description')).toBe(
       '把人话变成可复制、可还原的猫语，也能一键翻回来。',
     );
-    expect(meta(document, 'twitter:image')).toBe('https://meow.dee.moe/og-image.png');
+    expect(meta(document, 'twitter:image')).toBe('https://meow.dee.moe/og-image-v2.png');
     expect(meta(document, 'twitter:image:alt')).toBe('喵在说啥，可逆猫语翻译器');
   });
 
   test('ships social preview assets with expected dimensions', () => {
-    expect(pngDimensions(resolve(publicRoot, 'og-image.png'))).toEqual({
+    expect(pngDimensions(resolve(publicRoot, 'og-image-v2.png'))).toEqual({
       width: 1200,
       height: 630,
     });
@@ -86,5 +86,16 @@ describe('site metadata', () => {
       name: '喵在说啥',
       short_name: '喵在说啥',
     });
+  });
+
+  test('keeps generated social preview copy readable at link-card size', () => {
+    const generator = readFileSync(resolve(projectRoot, 'scripts/generate_social_assets.swift'), 'utf8');
+
+    expect(generator).toContain('og-image-v2.png');
+    expect(generator).toContain('可逆猫语翻译器');
+    expect(generator).not.toContain('把一句话变成可复制、可分享、可还原的猫语。');
+    expect(generator).not.toContain('喵 嗷 呜 叭 呼 咕...');
+    expect(generator).not.toContain('open the translator');
+    expect(generator).not.toContain('nya128-zh9');
   });
 });
