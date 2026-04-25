@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   decodeCatToDigits,
   encodeDigitsToCat,
+  EXPANDED_TOKEN_TABLE,
   TOKEN_TABLE,
 } from '../../src/protocol/tokens';
 
@@ -108,5 +109,42 @@ describe('nya155 token table', () => {
 
   it('rejects unknown prefixes', () => {
     expect(() => decodeCatToDigits('mewzzz')).toThrowError(/token/i);
+  });
+});
+
+describe('expanded token table', () => {
+  it('builds a 795-token vocabulary from the default table plus ASCII-suffixed tokens', () => {
+    const asciiSuffixes = [',', '!', '~', '?', ';'];
+    const baseTokens = TOKEN_TABLE.filter((token) => /^[\p{Script=Han}]+$/u.test(token) || /^[A-Za-z]+$/.test(token));
+
+    expect(baseTokens).toHaveLength(129);
+    expect(EXPANDED_TOKEN_TABLE).toHaveLength(795);
+    expect(EXPANDED_TOKEN_TABLE).not.toEqual(TOKEN_TABLE);
+
+    for (const suffix of asciiSuffixes) {
+      expect(EXPANDED_TOKEN_TABLE).not.toContain(suffix);
+    }
+
+    for (const token of baseTokens) {
+      expect(EXPANDED_TOKEN_TABLE).toContain(token);
+      for (const suffix of asciiSuffixes) {
+        expect(EXPANDED_TOKEN_TABLE).toContain(`${token}${suffix}`);
+      }
+    }
+  });
+
+  it('uses longest-match decoding for ASCII-suffixed tokens in the expanded vocabulary', () => {
+    const mewBangIndex = EXPANDED_TOKEN_TABLE.indexOf('mew!');
+    const cjkQuestionIndex = EXPANDED_TOKEN_TABLE.indexOf('喵喵?');
+    const plainMewIndex = EXPANDED_TOKEN_TABLE.indexOf('mew');
+
+    expect(mewBangIndex).toBeGreaterThan(-1);
+    expect(cjkQuestionIndex).toBeGreaterThan(-1);
+    expect(plainMewIndex).toBeGreaterThan(-1);
+    expect(decodeCatToDigits('mew!喵喵?mew', 'expanded')).toEqual([
+      mewBangIndex,
+      cjkQuestionIndex,
+      plainMewIndex,
+    ]);
   });
 });

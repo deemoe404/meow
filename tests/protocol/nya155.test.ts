@@ -108,4 +108,18 @@ describe('nya155 codec', () => {
     expect(shortEncoded.meta.tokenCount).toBe(decodeCatToDigits(shortEncoded.cat).length);
     expect(longEncoded.meta.tokenCount).toBe(decodeCatToDigits(longEncoded.cat).length);
   });
+
+  it('round-trips using the expanded 795-token vocabulary when requested', async () => {
+    const codec = createNya155Codec(createRawCompressionAdapter());
+    const text = '795 词表：你好，mew!';
+
+    const encoded = await codec.encode(text, 'expanded');
+    const decoded = await codec.decode(encoded.cat, 'expanded');
+
+    expect(decoded.text).toBe(text);
+    expect(encoded.meta.vocabulary).toBe('expanded');
+    expect(decoded.meta.vocabulary).toBe('expanded');
+    expect(encoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat, 'expanded').length);
+    expect(encoded.cat).toContain('!');
+  });
 });

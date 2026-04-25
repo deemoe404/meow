@@ -1,4 +1,8 @@
-import { TOKEN_TABLE } from '../protocol/tokens';
+import {
+  getTokenTable,
+  getVocabularySize,
+} from '../protocol/tokens';
+import type { TokenVocabularyId } from '../protocol/tokens';
 import type { EncodeResult, DecodeResult } from '../protocol/types';
 import type { WorkerReadyResult } from '../worker/messages';
 
@@ -8,8 +12,8 @@ const HERO_TAGLINE_SOURCE = '人在说啥';
 
 export interface AppService {
   ready(): Promise<WorkerReadyResult>;
-  encode(text: string): Promise<EncodeResult>;
-  decode(cat: string): Promise<DecodeResult>;
+  encode(text: string, vocabulary?: TokenVocabularyId): Promise<EncodeResult>;
+  decode(cat: string, vocabulary?: TokenVocabularyId): Promise<DecodeResult>;
   sample(): Promise<{ text: string }>;
 }
 
@@ -97,17 +101,33 @@ export async function createTranslatorApp(
       <div class="ambient ambient--sun" aria-hidden="true"></div>
       <div class="ambient ambient--sand" aria-hidden="true"></div>
 
-      <button
-        class="token-vocabulary-trigger"
-        type="button"
-        data-role="token-vocabulary-trigger"
-        aria-haspopup="dialog"
-        aria-expanded="false"
-        aria-label="查看当前词表，共 ${TOKEN_TABLE.length} 个 token"
-      >
-        <span>词表</span>
-        <strong>${TOKEN_TABLE.length}</strong>
-      </button>
+      <div class="vocabulary-controls" data-role="vocabulary-controls">
+        <button
+          class="expanded-vocabulary-toggle"
+          type="button"
+          role="switch"
+          aria-checked="false"
+          aria-label="启用 795 token 词表"
+          data-role="expanded-vocabulary-toggle"
+        >
+          <span class="expanded-vocabulary-toggle-track" aria-hidden="true">
+            <span class="expanded-vocabulary-toggle-thumb"></span>
+          </span>
+          <strong>795</strong>
+        </button>
+
+        <button
+          class="token-vocabulary-trigger"
+          type="button"
+          data-role="token-vocabulary-trigger"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-label="查看当前词表，共 ${getVocabularySize()} 个 token"
+        >
+          <span>词表</span>
+          <strong data-role="token-vocabulary-count">${getVocabularySize()}</strong>
+        </button>
+      </div>
 
       <header class="hero">
         <div class="hero-inner">
@@ -215,6 +235,10 @@ export async function createTranslatorApp(
   const tokenVocabularyTrigger = root.querySelector<HTMLButtonElement>(
     '[data-role="token-vocabulary-trigger"]',
   );
+  const tokenVocabularyCount = root.querySelector<HTMLElement>('[data-role="token-vocabulary-count"]');
+  const expandedVocabularyToggle = root.querySelector<HTMLButtonElement>(
+    '[data-role="expanded-vocabulary-toggle"]',
+  );
   const app = root.querySelector<HTMLElement>('.feline-app');
 
   if (
@@ -234,12 +258,15 @@ export async function createTranslatorApp(
     !metaCodec ||
     !metaTokenCount ||
     !inputCount ||
-    !tokenVocabularyTrigger
+    !tokenVocabularyTrigger ||
+    !tokenVocabularyCount ||
+    !expandedVocabularyToggle
   ) {
     throw new Error('app DOM 初始化失败');
   }
 
   let direction: Direction = 'human-to-cat';
+  let activeVocabulary: TokenVocabularyId = 'default';
   let copyResetTimer: number | null = null;
   let swapResetTimer: number | null = null;
   let textSwapResetTimer: number | null = null;
@@ -249,6 +276,7 @@ export async function createTranslatorApp(
   let tokenVocabularyOverlay: HTMLElement | null = null;
   let tokenVocabularyCloseTimer: number | null = null;
   let translateRunId = 0;
+  let heroRunId = 0;
   translate.disabled = true;
 
   const prefersReducedMotion = () =>
@@ -324,6 +352,7 @@ export async function createTranslatorApp(
   };
 
   const buildTokenVocabularyDialog = () => {
+    const tokenTable = getTokenTable(activeVocabulary);
     const overlay = document.createElement('div');
     overlay.className = 'token-vocabulary-overlay';
     overlay.dataset.role = 'token-vocabulary-overlay';
@@ -340,7 +369,7 @@ export async function createTranslatorApp(
 
     const title = document.createElement('h2');
     title.id = 'token-vocabulary-title';
-    title.textContent = `当前词表 / ${TOKEN_TABLE.length} tokens`;
+    title.textContent = `当前词表 / ${tokenTable.length} tokens`;
 
     const close = document.createElement('button');
     close.className = 'token-vocabulary-close';
@@ -357,7 +386,7 @@ export async function createTranslatorApp(
     list.dataset.role = 'token-vocabulary-list';
     list.setAttribute('role', 'list');
 
-    TOKEN_TABLE.forEach((token, index) => {
+    tokenTable.forEach((token, index) => {
       const item = document.createElement('div');
       item.className = 'token-vocabulary-item';
       item.dataset.role = 'token-list-item';
@@ -611,6 +640,16 @@ export async function createTranslatorApp(
     metaTokenCount.textContent = result ? String(result.meta.tokenCount) : '-';
   };
 
+  const renderVocabularyControls = () => {
+    const count = getVocabularySize(activeVocabulary);
+    const expanded = activeVocabulary === 'expanded';
+
+    expandedVocabularyToggle.setAttribute('aria-checked', expanded ? 'true' : 'false');
+    expandedVocabularyToggle.classList.toggle('is-active', expanded);
+    tokenVocabularyTrigger.setAttribute('aria-label', `查看当前词表，共 ${count} 个 token`);
+    tokenVocabularyCount.textContent = String(count);
+  };
+
   const runTranslate = async () => {
     const source = input.value;
     const runId = ++translateRunId;
@@ -619,10 +658,10 @@ export async function createTranslatorApp(
 
     try {
       if (direction === 'human-to-cat') {
-        const result = await service.encode(source);
+        const result = await service.encode(source, activeVocabulary);
         await replaceOutputValue(result.cat, result, runId, outputFadeOut);
       } else {
-        const result = await service.decode(source);
+        const result = await service.decode(source, activeVocabulary);
         await replaceOutputValue(result.text, result, runId, outputFadeOut);
       }
     } catch (err) {
@@ -638,10 +677,15 @@ export async function createTranslatorApp(
   };
 
   const updateHeroTagline = () => {
-    void service.encode(HERO_TAGLINE_SOURCE).then((result) => {
-      heroTagline.textContent = result.cat;
+    const runId = ++heroRunId;
+    void service.encode(HERO_TAGLINE_SOURCE, activeVocabulary).then((result) => {
+      if (runId === heroRunId) {
+        heroTagline.textContent = result.cat;
+      }
     }).catch(() => {
-      heroTagline.textContent = '';
+      if (runId === heroRunId) {
+        heroTagline.textContent = '';
+      }
     });
   };
 
@@ -668,6 +712,18 @@ export async function createTranslatorApp(
   input.addEventListener('input', updateInputCount);
 
   tokenVocabularyTrigger.addEventListener('click', openTokenVocabularyDialog);
+
+  expandedVocabularyToggle.addEventListener('click', () => {
+    activeVocabulary = activeVocabulary === 'default' ? 'expanded' : 'default';
+    setMeta(null);
+    setError(null);
+    renderVocabularyControls();
+    updateHeroTagline();
+
+    if (tokenVocabularyOverlay) {
+      closeTokenVocabularyDialog(false);
+    }
+  });
 
   translate.addEventListener('click', () => {
     void runTranslate();
@@ -709,6 +765,7 @@ export async function createTranslatorApp(
   });
 
   renderDirection();
+  renderVocabularyControls();
   updateInputCount();
 
   try {

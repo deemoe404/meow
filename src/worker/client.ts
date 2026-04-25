@@ -1,4 +1,5 @@
 import type { DecodeResult, EncodeResult } from '../protocol/types';
+import type { TokenVocabularyId } from '../protocol/tokens';
 import type {
   WorkerReadyResult,
   WorkerRequest,
@@ -12,8 +13,8 @@ interface PendingRequest {
 
 export interface WorkerClient {
   ready(): Promise<WorkerReadyResult>;
-  encode(text: string): Promise<EncodeResult>;
-  decode(cat: string): Promise<DecodeResult>;
+  encode(text: string, vocabulary?: TokenVocabularyId): Promise<EncodeResult>;
+  decode(cat: string, vocabulary?: TokenVocabularyId): Promise<DecodeResult>;
   sample(): Promise<{ text: string }>;
   dispose(): void;
 }
@@ -61,18 +62,18 @@ export function createWorkerClient(worker: Worker): WorkerClient {
     ready() {
       return request<WorkerReadyResult>((id) => ({ id, type: 'ready' }));
     },
-    encode(text) {
+    encode(text, vocabulary = 'default') {
       return request<EncodeResult>((id) => ({
         id,
         type: 'encode',
-        payload: { text },
+        payload: { text, vocabulary },
       }));
     },
-    decode(cat) {
+    decode(cat, vocabulary = 'default') {
       return request<DecodeResult>((id) => ({
         id,
         type: 'decode',
-        payload: { cat },
+        payload: { cat, vocabulary },
       }));
     },
     sample() {
