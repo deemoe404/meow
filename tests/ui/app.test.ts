@@ -1,5 +1,8 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it, vi } from 'vitest';
 
+import { TOKEN_TABLE } from '../../src/protocol/tokens';
 import { createTranslatorApp } from '../../src/ui/app';
 import type { AppService } from '../../src/ui/app';
 
@@ -45,6 +48,36 @@ async function flush() {
 }
 
 describe('translator app', () => {
+  it('uses a playful pivot animation for the token vocabulary dialog', () => {
+    const css = readFileSync('src/style.css', 'utf8');
+    const enterAnimation = css.match(/@keyframes vocabulary-dialog-enter \{[\s\S]*?\n\}/)?.[0] ?? '';
+    const exitAnimation = css.match(/@keyframes vocabulary-dialog-exit \{[\s\S]*?\n\}/)?.[0] ?? '';
+    const tokenListRule = css.match(/\.token-vocabulary-list \{[\s\S]*?\n\}/)?.[0] ?? '';
+    const tokenItemRule = css.match(/\.token-vocabulary-item \{[\s\S]*?\n\}/)?.[0] ?? '';
+
+    expect(css).toContain('transform-origin: 42% 68%;');
+    expect(enterAnimation).toContain('translate3d(-10px, calc(50svh + 56px), 0)');
+    expect(enterAnimation).toContain('rotate(-6deg)');
+    expect(enterAnimation).toContain('scale(0.96)');
+    expect(exitAnimation).toContain('translate3d(-10px, calc(50svh + 56px), 0)');
+    expect(enterAnimation).not.toContain('58%');
+    expect(enterAnimation).not.toContain('rotate(-2deg)');
+    expect(enterAnimation).not.toContain('rotate(1.4deg)');
+    expect(enterAnimation).not.toContain('scale(1.006)');
+    expect(css).toContain('vocabulary-dialog-enter 300ms');
+    expect(css).toContain('vocabulary-dialog-exit 220ms');
+    expect(css).toContain('contain: layout paint;');
+    expect(css).not.toContain('vocabulary-list-enter');
+    expect(css).not.toContain('backdrop-filter: blur(10px);');
+    expect(css).not.toContain('scale(0.88)');
+    expect(tokenListRule).toContain('grid-template-columns: repeat(4, minmax(0, 1fr));');
+    expect(tokenListRule).toContain('gap: 0;');
+    expect(tokenItemRule).toContain('border-bottom: 1px solid');
+    expect(tokenItemRule).not.toContain('border: 1px solid');
+    expect(tokenItemRule).not.toContain('background: rgba(255, 250, 244');
+    expect(tokenItemRule).not.toContain('border-radius');
+  });
+
   it('renders the feline translator workspace from the target design', async () => {
     const root = document.createElement('div');
     document.body.append(root);
@@ -74,6 +107,83 @@ describe('translator app', () => {
     expect(root.textContent).toContain('codec');
     expect(root.textContent).not.toContain('rawLength');
     expect(root.textContent).toContain('tokenCount');
+  });
+
+  it('opens the current token vocabulary dialog from the capacity entry', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    await createTranslatorApp(root, createService());
+
+    const trigger = root.querySelector<HTMLButtonElement>('[data-role="token-vocabulary-trigger"]');
+
+    expect(trigger).not.toBeNull();
+    expect(trigger!.textContent).toContain('词表');
+    expect(trigger!.textContent).toContain(String(TOKEN_TABLE.length));
+    expect(root.textContent).not.toContain('占用');
+    expect(root.querySelector('[data-role="token-vocabulary-dialog"]')).toBeNull();
+
+    trigger!.click();
+
+    const dialog = root.querySelector<HTMLElement>('[data-role="token-vocabulary-dialog"]');
+    const items = root.querySelectorAll('[data-role="token-list-item"]');
+    const firstItem = root.querySelector<HTMLElement>('[data-token-index="0"]');
+    const spaceItem = root.querySelector<HTMLElement>('[data-token-index="118"]');
+    const lastItem = root.querySelector<HTMLElement>(`[data-token-index="${TOKEN_TABLE.length - 1}"]`);
+
+    expect(trigger!.getAttribute('aria-expanded')).toBe('true');
+    expect(dialog).not.toBeNull();
+    expect(dialog!.getAttribute('role')).toBe('dialog');
+    expect(dialog!.getAttribute('aria-modal')).toBe('true');
+    expect(dialog!.textContent).toContain(`当前词表 / ${TOKEN_TABLE.length} tokens`);
+    expect(items).toHaveLength(TOKEN_TABLE.length);
+    expect(firstItem?.textContent).toContain('0');
+    expect(firstItem?.textContent).toContain(TOKEN_TABLE[0]);
+    expect(spaceItem?.textContent).toContain('118');
+    expect(spaceItem?.textContent).toContain('空格 (" ")');
+    expect(lastItem?.textContent).toContain(String(TOKEN_TABLE.length - 1));
+    expect(lastItem?.textContent).toContain(TOKEN_TABLE[TOKEN_TABLE.length - 1]);
+  });
+
+  it('animates the token vocabulary dialog closed before removing it and restoring focus', async () => {
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
+
+      await createTranslatorApp(root, createService());
+
+      const trigger = root.querySelector<HTMLButtonElement>('[data-role="token-vocabulary-trigger"]');
+
+      trigger!.focus();
+      trigger!.click();
+
+      root.querySelector<HTMLButtonElement>('[data-role="token-vocabulary-close"]')!.click();
+
+      const closingOverlay = root.querySelector<HTMLElement>('[data-role="token-vocabulary-overlay"]');
+      expect(closingOverlay).not.toBeNull();
+      expect(closingOverlay!.classList.contains('is-closing')).toBe(true);
+      expect(root.querySelector('[data-role="token-vocabulary-dialog"]')).not.toBeNull();
+      expect(trigger!.getAttribute('aria-expanded')).toBe('false');
+
+      vi.advanceTimersByTime(220);
+
+      expect(root.querySelector('[data-role="token-vocabulary-dialog"]')).toBeNull();
+      expect(document.activeElement).toBe(trigger);
+
+      trigger!.click();
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+      expect(root.querySelector('[data-role="token-vocabulary-overlay"]')?.classList.contains('is-closing')).toBe(true);
+
+      vi.advanceTimersByTime(220);
+
+      expect(root.querySelector('[data-role="token-vocabulary-dialog"]')).toBeNull();
+      expect(trigger!.getAttribute('aria-expanded')).toBe('false');
+      expect(document.activeElement).toBe(trigger);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('encodes human text and updates output/meta', async () => {
