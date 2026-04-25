@@ -113,45 +113,57 @@ describe('nya155 token table', () => {
 });
 
 describe('expanded token table', () => {
-  it('builds a 1568-token vocabulary from ASCII and space-suffixed expansions', () => {
-    const asciiSuffixes = [',', '!', '~', '?', ';'];
+  it('builds an 8018-token vocabulary from !/? suffix sequences up to length 4', () => {
+    const removedStandaloneTokens = [',', '!', '~', '?', ';'];
+    const punctuationSequences = [
+      '!', '?',
+      '!!', '!?', '?!', '??',
+      '!!!', '!!?', '!?!', '!??', '?!!', '?!?', '??!', '???',
+      '!!!!', '!!!?', '!!?!', '!!??', '!?!!', '!?!?', '!??!', '!???',
+      '?!!!', '?!!?', '?!?!', '?!??', '??!!', '??!?', '???!', '????',
+    ];
     const baseTokens = TOKEN_TABLE.filter((token) => /^[\p{Script=Han}]+$/u.test(token) || /^[A-Za-z]+$/.test(token));
 
     expect(baseTokens).toHaveLength(129);
-    expect(EXPANDED_TOKEN_TABLE).toHaveLength(1568);
+    expect(new Set(punctuationSequences)).toHaveLength(30);
+    expect(EXPANDED_TOKEN_TABLE).toHaveLength(8018);
     expect(EXPANDED_TOKEN_TABLE).not.toEqual(TOKEN_TABLE);
     expect(EXPANDED_TOKEN_TABLE).not.toContain(' ');
 
-    for (const suffix of asciiSuffixes) {
-      expect(EXPANDED_TOKEN_TABLE).not.toContain(suffix);
+    for (const token of removedStandaloneTokens) {
+      expect(EXPANDED_TOKEN_TABLE).not.toContain(token);
     }
 
     for (const token of baseTokens) {
       expect(EXPANDED_TOKEN_TABLE).toContain(token);
       expect(EXPANDED_TOKEN_TABLE).toContain(`${token} `);
-      for (const suffix of asciiSuffixes) {
-        expect(EXPANDED_TOKEN_TABLE).toContain(`${token}${suffix}`);
-        expect(EXPANDED_TOKEN_TABLE).toContain(`${token}${suffix} `);
+      for (const sequence of punctuationSequences) {
+        expect(EXPANDED_TOKEN_TABLE).toContain(`${token}${sequence}`);
+        expect(EXPANDED_TOKEN_TABLE).toContain(`${token}${sequence} `);
       }
+      expect(EXPANDED_TOKEN_TABLE).not.toContain(`${token},`);
+      expect(EXPANDED_TOKEN_TABLE).not.toContain(`${token}~`);
+      expect(EXPANDED_TOKEN_TABLE).not.toContain(`${token};`);
+      expect(EXPANDED_TOKEN_TABLE).not.toContain(`${token}!!!!!`);
     }
   });
 
-  it('uses longest-match decoding for ASCII and space-suffixed expanded tokens', () => {
-    const mewBangIndex = EXPANDED_TOKEN_TABLE.indexOf('mew!');
-    const mewBangSpaceIndex = EXPANDED_TOKEN_TABLE.indexOf('mew! ');
-    const cjkQuestionSpaceIndex = EXPANDED_TOKEN_TABLE.indexOf('喵喵? ');
+  it('uses longest-match decoding for !/? sequence and space-suffixed expanded tokens', () => {
+    const mewBangQuestionIndex = EXPANDED_TOKEN_TABLE.indexOf('mew!?');
+    const mewK4SpaceIndex = EXPANDED_TOKEN_TABLE.indexOf('mew!?!? ');
+    const cjkK4SpaceIndex = EXPANDED_TOKEN_TABLE.indexOf('喵喵???? ');
     const plainMewSpaceIndex = EXPANDED_TOKEN_TABLE.indexOf('mew ');
     const plainMewIndex = EXPANDED_TOKEN_TABLE.indexOf('mew');
 
-    expect(mewBangIndex).toBeGreaterThan(-1);
-    expect(mewBangSpaceIndex).toBeGreaterThan(-1);
-    expect(cjkQuestionSpaceIndex).toBeGreaterThan(-1);
+    expect(mewBangQuestionIndex).toBeGreaterThan(-1);
+    expect(mewK4SpaceIndex).toBeGreaterThan(-1);
+    expect(cjkK4SpaceIndex).toBeGreaterThan(-1);
     expect(plainMewSpaceIndex).toBeGreaterThan(-1);
     expect(plainMewIndex).toBeGreaterThan(-1);
-    expect(decodeCatToDigits('mew!mew! 喵喵? mew mew', 'expanded')).toEqual([
-      mewBangIndex,
-      mewBangSpaceIndex,
-      cjkQuestionSpaceIndex,
+    expect(decodeCatToDigits('mew!?mew!?!? 喵喵???? mew mew', 'expanded')).toEqual([
+      mewBangQuestionIndex,
+      mewK4SpaceIndex,
+      cjkK4SpaceIndex,
       plainMewSpaceIndex,
       plainMewIndex,
     ]);

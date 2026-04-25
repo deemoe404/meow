@@ -32,7 +32,7 @@ describe('base-N digits without padding', () => {
   });
 
   it('round-trips with a caller-selected base', () => {
-    const base = 1568;
+    const base = 8018;
     const bytes = Uint8Array.from([255]);
     const digits = bytesToBaseNDigitsNoPad(bytes, base);
 
@@ -44,6 +44,6 @@ describe('base-N digits without padding', () => {
     expect(() => baseNDigitsToBytesNoPad([TOKEN_TABLE.length])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([-1])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([1.5])).toThrowError(/digit/i);
-    expect(() => baseNDigitsToBytesNoPad([1568], 1568)).toThrowError(/digit/i);
+    expect(() => baseNDigitsToBytesNoPad([8018], 8018)).toThrowError(/digit/i);
   });
 });

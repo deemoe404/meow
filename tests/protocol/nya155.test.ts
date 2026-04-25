@@ -109,9 +109,9 @@ describe('nya155 codec', () => {
     expect(longEncoded.meta.tokenCount).toBe(decodeCatToDigits(longEncoded.cat).length);
   });
 
-  it('round-trips using the expanded 1568-token vocabulary when requested', async () => {
+  it('round-trips using the expanded 8018-token vocabulary when requested', async () => {
     const codec = createNya155Codec(createRawCompressionAdapter());
-    const text = '1568 词表：你好，mew! ';
+    const text = '8018 词表：你好，mew!?!? ';
 
     const encoded = await codec.encode(text, 'expanded');
     const decoded = await codec.decode(encoded.cat, 'expanded');

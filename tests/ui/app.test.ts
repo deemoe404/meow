@@ -540,8 +540,8 @@ describe('translator app', () => {
 
     expect(toggle).not.toBeNull();
     expect(trigger).not.toBeNull();
-    expect(toggle!.textContent).toContain('1568');
-    expect(toggle!.getAttribute('aria-label')).toContain('1568');
+    expect(toggle!.textContent).toContain('8018');
+    expect(toggle!.getAttribute('aria-label')).toContain('8018');
     expect(toggle!.getAttribute('aria-checked')).toBe('false');
     expect(trigger!.textContent).toContain(String(TOKEN_TABLE.length));
 
