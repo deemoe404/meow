@@ -1,4 +1,5 @@
 import type { CodecId, CodecName, DecodeResult, EncodeResult } from '../protocol/types';
+import type { TokenVocabularyId } from '../protocol/tokens';
 
 export interface CodecInfo {
   id: CodecId;
@@ -12,8 +13,8 @@ export interface WorkerReadyResult {
 
 export type WorkerRequest =
   | { id: string; type: 'ready' }
-  | { id: string; type: 'encode'; payload: { text: string } }
-  | { id: string; type: 'decode'; payload: { cat: string } }
+  | { id: string; type: 'encode'; payload: { text: string; vocabulary?: TokenVocabularyId } }
+  | { id: string; type: 'decode'; payload: { cat: string; vocabulary?: TokenVocabularyId } }
   | { id: string; type: 'sample' };
 
 export type WorkerResultMap = {

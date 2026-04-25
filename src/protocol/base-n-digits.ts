@@ -1,15 +1,26 @@
 import { ProtocolError } from './errors';
 import { TOKEN_TABLE } from './tokens';
 
-const BASE = TOKEN_TABLE.length;
+const DEFAULT_BASE: number = TOKEN_TABLE.length;
 
-function ensureDigit(digit: number): void {
-  if (!Number.isInteger(digit) || digit < 0 || digit >= BASE) {
-    throw new ProtocolError(`digit 超出 0..${BASE - 1} 范围。`, 'invalid-input');
+function ensureBase(base: number): void {
+  if (!Number.isInteger(base) || base < 2) {
+    throw new ProtocolError('base 必须是大于 1 的整数。', 'invalid-input');
   }
 }
 
-export function bytesToBaseNDigitsNoPad(bytes: Uint8Array): number[] {
+function ensureDigit(digit: number, base: number): void {
+  if (!Number.isInteger(digit) || digit < 0 || digit >= base) {
+    throw new ProtocolError(`digit 超出 0..${base - 1} 范围。`, 'invalid-input');
+  }
+}
+
+export function bytesToBaseNDigitsNoPad(
+  bytes: Uint8Array,
+  base: number = DEFAULT_BASE,
+): number[] {
+  ensureBase(base);
+
   if (bytes.length === 0) {
     return [];
   }
@@ -26,20 +37,25 @@ export function bytesToBaseNDigitsNoPad(bytes: Uint8Array): number[] {
 
     for (let digitIndex = digits.length - 1; digitIndex >= 0; digitIndex -= 1) {
       const value = digits[digitIndex] * 256 + carry;
-      digits[digitIndex] = value % BASE;
-      carry = Math.floor(value / BASE);
+      digits[digitIndex] = value % base;
+      carry = Math.floor(value / base);
     }
 
     while (carry > 0) {
-      digits.unshift(carry % BASE);
-      carry = Math.floor(carry / BASE);
+      digits.unshift(carry % base);
+      carry = Math.floor(carry / base);
     }
   }
 
   return Array.from({ length: leadingZeroBytes }, () => 0).concat(digits);
 }
 
-export function baseNDigitsToBytesNoPad(digits: number[]): Uint8Array {
+export function baseNDigitsToBytesNoPad(
+  digits: number[],
+  base: number = DEFAULT_BASE,
+): Uint8Array {
+  ensureBase(base);
+
   if (digits.length === 0) {
     return Uint8Array.of();
   }
@@ -53,12 +69,12 @@ export function baseNDigitsToBytesNoPad(digits: number[]): Uint8Array {
 
   for (let index = leadingZeroDigits; index < digits.length; index += 1) {
     const digit = digits[index];
-    ensureDigit(digit);
+    ensureDigit(digit, base);
 
     let carry = digit;
 
     for (let byteIndex = bytes.length - 1; byteIndex >= 0; byteIndex -= 1) {
-      const value = bytes[byteIndex] * BASE + carry;
+      const value = bytes[byteIndex] * base + carry;
       bytes[byteIndex] = value & 0xff;
       carry = Math.floor(value / 256);
     }

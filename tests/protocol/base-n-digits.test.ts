@@ -31,9 +31,19 @@ describe('base-N digits without padding', () => {
     expect(restored).toEqual(Uint8Array.from([highestDigit]));
   });
 
+  it('round-trips with a caller-selected base', () => {
+    const base = 795;
+    const bytes = Uint8Array.from([255]);
+    const digits = bytesToBaseNDigitsNoPad(bytes, base);
+
+    expect(digits).toEqual([255]);
+    expect(baseNDigitsToBytesNoPad(digits, base)).toEqual(bytes);
+  });
+
   it('rejects invalid digits during decode', () => {
     expect(() => baseNDigitsToBytesNoPad([TOKEN_TABLE.length])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([-1])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([1.5])).toThrowError(/digit/i);
+    expect(() => baseNDigitsToBytesNoPad([795], 795)).toThrowError(/digit/i);
   });
 });

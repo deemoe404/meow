@@ -1,3 +1,5 @@
+import type { TokenVocabularyId } from './tokens';
+
 export type CodecId = 0 | 1;
 
 export type CodecName = 'raw' | 'zstd-dict';
@@ -24,6 +26,7 @@ export interface CompressionAdapter {
 export interface ProtocolMeta {
   codec: CodecId;
   tokenCount: number;
+  vocabulary: TokenVocabularyId;
 }
 
 export interface EncodeResult {

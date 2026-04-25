@@ -1,5 +1,6 @@
 import { ProtocolError } from '../protocol/errors';
 import type { DecodeResult, EncodeResult } from '../protocol/types';
+import type { TokenVocabularyId } from '../protocol/tokens';
 import type {
   WorkerErrorShape,
   WorkerReadyResult,
@@ -9,8 +10,8 @@ import type {
 
 export interface WorkerService {
   ready(): Promise<WorkerReadyResult>;
-  encode(text: string): Promise<EncodeResult>;
-  decode(cat: string): Promise<DecodeResult>;
+  encode(text: string, vocabulary: TokenVocabularyId): Promise<EncodeResult>;
+  decode(cat: string, vocabulary: TokenVocabularyId): Promise<DecodeResult>;
   sample(): { text: string } | Promise<{ text: string }>;
 }
 
@@ -46,14 +47,14 @@ export function createWorkerHandler(service: WorkerService) {
             id: request.id,
             type: request.type,
             status: 'ok',
-            result: await service.encode(request.payload.text),
+            result: await service.encode(request.payload.text, request.payload.vocabulary ?? 'default'),
           };
         case 'decode':
           return {
             id: request.id,
             type: request.type,
             status: 'ok',
-            result: await service.decode(request.payload.cat),
+            result: await service.decode(request.payload.cat, request.payload.vocabulary ?? 'default'),
           };
         case 'sample':
           return {
