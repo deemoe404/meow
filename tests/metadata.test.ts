@@ -96,6 +96,6 @@ describe('site metadata', () => {
     expect(generator).not.toContain('把一句话变成可复制、可分享、可还原的猫语。');
     expect(generator).not.toContain('喵 嗷 呜 叭 呼 咕...');
     expect(generator).not.toContain('open the translator');
-    expect(generator).not.toContain('nya128-zh9');
+    expect(generator).not.toMatch(/nya\d+-zh\d+/);
   });
 });

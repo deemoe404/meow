@@ -1,10 +1,10 @@
 # 猫语翻译器
 
-一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya128-zh9`。
+一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya152-zh10`。
 
 ## 特性
 
-- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base128 digit -> 128-token 猫语`
+- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base152 digit -> 152-token 猫语`
 - `raw` 与 `zstd-dict` 双 codec，编码时自动选择更短 payload
 - 浏览器本地编解码，无服务端依赖
 - 主线程 UI + Web Worker 协议内核，避免压缩和 wasm 初始化卡住页面
@@ -35,15 +35,15 @@ pnpm run assets:social
 
 ## 协议说明
 
-`nya128-zh9` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。
+`nya152-zh10` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。
 
 编码流程：
 
 1. 文本按原样转成 UTF-8 字节
 2. 同时尝试 `raw` 与 `zstd-dict`
 3. 打包为极简 codec frame：首字节是 codec tag，剩余字节全部视为 payload
-4. codec frame 走无 padding 的 128 进制 digit 切片
-5. digit 直接映射到固定 128-token 猫语表，输出串中的每个 token 都承载 payload
+4. codec frame 走无 padding 的 152 进制 digit 切片
+5. digit 直接映射到固定 152-token 猫语表，输出串中的每个 token 都承载 payload
 
 协议内部的 `CodecId` 与 wire tag 分开表示：UI / meta 中的 codec id 使用 `0 raw`、`1 zstd-dict`；写入 codec frame 首字节的 wire tag 固定为：
 
@@ -58,18 +58,21 @@ pnpm run assets:social
 
 ```text
 0 ！   1 ～   2 喵喵 3 咪喵 4 喵呜 5 咪呜 6 喵嗷 7 咪嗷 8 呼噜 9 咕噜
-10 mew 11 MEW 12 meo 13 MEO 14 mia 15 MIA 16 mio 17 MIO 18 miu 19 MIU
-20 mao 21 MAO 22 mau 23 MAU 24 mow 25 MOW 26 nya 27 NYA 28 nyo 29 NYO
-30 nyu 31 NYU 32 mya 33 MYA 34 myo 35 MYO 36 myu 37 MYU 38 mrr 39 MRR
-40 prr 41 PRR 42 pur 43 PUR 44 mur 45 MUR 46 eow 47 EOW 48 iao 49 IAO
-50 iau 51 IAU 52 yow 53 YOW 54 urr 55 URR 56 rrr 57 RRR
-58 哈 59 — 60 瞄瞄 61 喵咪 62 喵喔 63 喵唔 64 喵呼 65 眯喵 66 迷喵 67 咪描
-68 咪瞄 69 喵乌 70 喵屋 71 喵嗚 72 咪乌 73 咪屋 74 咪唔 75 咪嗚 76 咪呼 77 苗嗷
-78 瞄嗷 79 喵凹 80 喵熬 81 喵嚎 82 喵奥 83 喵敖 84 眯嗷 85 迷嗷 86 咪凹 87 咪熬
-88 咪嚎 89 咪奥 90 咪敖 91 乎噜 92 忽噜 93 惚噜 94 估噜 95 姑噜 96 菇噜 97 箍噜
-98 嗷呜 99 嗷乌 100 嗷屋 101 熬呜 102 敖呜 103 遨呜 104 嗷唔 105 嗷喔 106 嗷喵 107 咪咪喵
-108 … 109 , 110 ， 111 ! 112 ~ 113 、 114 ？ 115 ? 116 ... 117 。。。 118 <space>
-119 (^_^) 120 (^o^) 121 (^w^) 122 (^ω^) 123 (^x^) 124 (^ェ^) 125 (^ﻌ^) 126 (•ω•) 127 (•ᆺ•)
+10 mew 11 MEW 12 Mew 13 meo 14 MEO 15 Meo 16 mia 17 MIA 18 Mia 19 mio
+20 MIO 21 Mio 22 miu 23 MIU 24 Miu 25 mao 26 MAO 27 Mao 28 mau 29 MAU
+30 Mau 31 mow 32 MOW 33 Mow 34 nya 35 NYA 36 Nya 37 nyo 38 NYO 39 Nyo
+40 nyu 41 NYU 42 Nyu 43 mya 44 MYA 45 Mya 46 myo 47 MYO 48 Myo 49 myu
+50 MYU 51 Myu 52 mrr 53 MRR 54 Mrr 55 prr 56 PRR 57 Prr 58 pur 59 PUR
+60 Pur 61 mur 62 MUR 63 Mur 64 eow 65 EOW 66 Eow 67 iao 68 IAO 69 Iao
+70 iau 71 IAU 72 Iau 73 yow 74 YOW 75 Yow 76 urr 77 URR 78 Urr 79 rrr
+80 RRR 81 Rrr
+82 哈 83 — 84 瞄瞄 85 喵咪 86 喵喔 87 喵唔 88 喵呼 89 眯喵 90 迷喵 91 咪描
+92 咪瞄 93 喵乌 94 喵屋 95 喵嗚 96 咪乌 97 咪屋 98 咪唔 99 咪嗚 100 咪呼 101 苗嗷
+102 瞄嗷 103 喵凹 104 喵熬 105 喵嚎 106 喵奥 107 喵敖 108 眯嗷 109 迷嗷 110 咪凹 111 咪熬
+112 咪嚎 113 咪奥 114 咪敖 115 乎噜 116 忽噜 117 惚噜 118 估噜 119 姑噜 120 菇噜 121 箍噜
+122 嗷呜 123 嗷乌 124 嗷屋 125 熬呜 126 敖呜 127 遨呜 128 嗷唔 129 嗷喔 130 嗷喵 131 咪咪喵
+132 … 133 , 134 ， 135 ! 136 ~ 137 、 138 ？ 139 ? 140 ... 141 。。。 142 <space>
+143 (^_^) 144 (^o^) 145 (^w^) 146 (^ω^) 147 (^x^) 148 (^ェ^) 149 (^ﻌ^) 150 (•ω•) 151 (•ᆺ•)
 ```
 
 ## 字典资产
