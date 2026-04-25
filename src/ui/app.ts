@@ -4,6 +4,7 @@ import type { WorkerReadyResult } from '../worker/messages';
 
 type Direction = 'human-to-cat' | 'cat-to-human';
 const TOKEN_VOCABULARY_CLOSE_MS = 220;
+const HERO_TAGLINE_SOURCE = '人在说啥';
 
 export interface AppService {
   ready(): Promise<WorkerReadyResult>;
@@ -109,7 +110,7 @@ export async function createTranslatorApp(
           <h1 id="app-title">喵在说啥</h1>
           <p class="tagline">
             <span aria-hidden="true"></span>
-            THE FELINE CONNECTION
+            <strong class="tagline-cat" data-role="tagline-cat" aria-label="人在说啥的猫语翻译">...</strong>
             <span aria-hidden="true"></span>
           </p>
         </div>
@@ -189,6 +190,7 @@ export async function createTranslatorApp(
 
   const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
   const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+  const heroTagline = root.querySelector<HTMLElement>('[data-role="tagline-cat"]');
   const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
   const copy = root.querySelector<HTMLButtonElement>('[data-role="copy"]');
   const clear = root.querySelector<HTMLButtonElement>('[data-role="clear"]');
@@ -210,6 +212,7 @@ export async function createTranslatorApp(
     !app ||
     !input ||
     !output ||
+    !heroTagline ||
     !translate ||
     !copy ||
     !clear ||
@@ -623,6 +626,14 @@ export async function createTranslatorApp(
     inputCount.textContent = `${input.value.length} / 5000`;
   };
 
+  const updateHeroTagline = () => {
+    void service.encode(HERO_TAGLINE_SOURCE).then((result) => {
+      heroTagline.textContent = result.cat;
+    }).catch(() => {
+      heroTagline.textContent = '';
+    });
+  };
+
   sourceLabel.addEventListener('click', () => {
     if (direction === 'cat-to-human') {
       direction = 'human-to-cat';
@@ -693,6 +704,7 @@ export async function createTranslatorApp(
     const ready = await service.ready();
     status.textContent = `就绪：${ready.codecs.map((codec) => codec.name).join(' / ')}`;
     translate.disabled = false;
+    updateHeroTagline();
   } catch (err) {
     status.textContent = '运行时不可用';
     setError(err instanceof Error ? err.message : '运行时初始化失败。');
