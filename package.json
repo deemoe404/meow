@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "assets:social": "swift scripts/generate_social_assets.swift",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",

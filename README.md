@@ -27,6 +27,12 @@ pnpm build
 pnpm preview
 ```
 
+社交预览图和站点图标由 [scripts/generate_social_assets.swift](scripts/generate_social_assets.swift) 生成：
+
+```bash
+pnpm run assets:social
+```
+
 ## 协议说明
 
 `nya128-zh9` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～` 与 `〜`。

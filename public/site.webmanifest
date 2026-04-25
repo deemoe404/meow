@@ -1,0 +1,21 @@
+{
+  "name": "喵在说啥",
+  "short_name": "喵在说啥",
+  "description": "把人话变成可复制、可还原的猫语，也能一键翻回来。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fcfbf9",
+  "theme_color": "#f4a261",
+  "icons": [
+    {
+      "src": "/web-app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
