@@ -119,9 +119,9 @@ export async function createTranslatorApp(
       <main class="translator-stage">
         <section class="outer-pebble" aria-label="猫语翻译器">
           <div class="language-row" aria-label="翻译方向">
-            <button class="language-pill language-pill--source language-pill--chinese" type="button" data-role="source-label">Chinese</button>
+            <button class="language-pill language-pill--source language-pill--chinese" type="button" data-role="source-label">人话</button>
             <span class="language-arrow">${icon('east')}</span>
-            <button class="language-pill language-pill--target language-pill--cat" type="button" data-role="target-label">Cat</button>
+            <button class="language-pill language-pill--target language-pill--cat" type="button" data-role="target-label">猫语</button>
           </div>
 
           <div class="editor-grid">
@@ -136,7 +136,7 @@ export async function createTranslatorApp(
                 aria-label="输入文本"
                 maxlength="5000"
                 rows="12"
-                placeholder="Type here to meow..."
+                placeholder="输入要翻译的人话..."
               ></textarea>
               <div class="input-footer">
                 <span data-role="input-count">0 / 5000</span>
@@ -182,10 +182,11 @@ export async function createTranslatorApp(
         </section>
       </main>
 
-      <button class="floating-paw-action" type="button" data-role="translate" aria-label="翻译">
-        ${icon('paw')}
-      </button>
     </section>
+
+    <button class="floating-paw-action" type="button" data-role="translate" aria-label="翻译">
+      ${icon('paw')}
+    </button>
   `;
 
   const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
@@ -581,6 +582,8 @@ export async function createTranslatorApp(
     input.classList.toggle('text-content--chinese', !inputIsCat);
     output.classList.toggle('text-content--cat', !inputIsCat);
     output.classList.toggle('text-content--chinese', inputIsCat);
+    input.placeholder = inputIsCat ? '输入要翻译的猫语...' : '输入要翻译的人话...';
+    output.placeholder = inputIsCat ? '翻译后的人话会出现在这里...' : '翻译后的猫语会出现在这里...';
     buttonPressed(sourceLabel, direction === 'human-to-cat');
     buttonPressed(targetLabel, direction === 'cat-to-human');
   };
