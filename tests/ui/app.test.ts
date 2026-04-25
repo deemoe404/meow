@@ -83,9 +83,12 @@ describe('translator app', () => {
     document.body.append(root);
 
     await createTranslatorApp(root, createService());
+    await flush();
 
     expect(root.querySelector('h1')?.textContent?.trim()).toBe('喵在说啥');
-    expect(root.textContent).toContain('THE FELINE CONNECTION');
+    expect(root.querySelector('[data-role="tagline-cat"]')?.textContent).toBe('！喵喵mewMEW');
+    expect(root.textContent).not.toContain('THE FELINE CONNECTION');
+    expect(root.textContent).not.toContain('动态地用目前的翻译程序，把“人在说啥”翻译成猫语。');
     expect(root.querySelector('[data-role="source-label"]')?.textContent).toBe('Chinese');
     expect(root.querySelector('[data-role="target-label"]')?.textContent).toBe('Cat');
     expect(root.querySelector('[data-role="source-label"]')?.classList.contains('language-pill--chinese')).toBe(true);

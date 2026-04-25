@@ -386,6 +386,17 @@ h1::after {
   background: rgba(233, 196, 106, 0.82);
 }
 
+.tagline-cat {
+  max-width: min(560px, 72vw);
+  color: rgba(38, 75, 89, 0.82);
+  font-family: "ZCOOL KuaiLe", "Plus Jakarta Sans", sans-serif;
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
 .translator-stage {
   position: relative;
   display: flex;
