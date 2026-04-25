@@ -24,7 +24,7 @@ function buildMeta(
   };
 }
 
-export function createNya128Codec(adapter: CompressionAdapter) {
+export function createNya152Codec(adapter: CompressionAdapter) {
   const textEncoder = new TextEncoder();
   const textDecoder = new TextDecoder();
   let initPromise: Promise<unknown> | null = null;
