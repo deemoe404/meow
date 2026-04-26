@@ -69,23 +69,23 @@ describe('worker client', () => {
     await expect(pending).rejects.toThrowError(/boom/);
   });
 
-  it('sends the selected token vocabulary with encode and decode requests', () => {
+  it('sends encode and decode requests without vocabulary selection', () => {
     const worker = new FakeWorker();
     const client = createWorkerClient(worker as unknown as Worker);
 
-    void client.encode('hello', 'expanded');
-    void client.decode('mew!', 'expanded');
+    void client.encode('hello');
+    void client.decode('mew!');
 
     expect(worker.posted).toEqual([
       {
         id: 'req-1',
         type: 'encode',
-        payload: { text: 'hello', vocabulary: 'expanded' },
+        payload: { text: 'hello' },
       },
       {
         id: 'req-2',
         type: 'decode',
-        payload: { cat: 'mew!', vocabulary: 'expanded' },
+        payload: { cat: 'mew!' },
       },
     ]);
   });

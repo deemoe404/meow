@@ -8,7 +8,6 @@ import {
   encodeDigitsToCat,
   getVocabularySize,
 } from './tokens';
-import type { TokenVocabularyId } from './tokens';
 import type {
   CompressionAdapter,
   DecodeResult,
@@ -19,12 +18,10 @@ import type {
 function buildMeta(
   codec: ProtocolMeta['codec'],
   tokenCount: number,
-  vocabulary: TokenVocabularyId,
 ): ProtocolMeta {
   return {
     codec,
     tokenCount,
-    vocabulary,
   };
 }
 
@@ -41,10 +38,7 @@ export function createNya155Codec(adapter: CompressionAdapter) {
     await initPromise;
   }
 
-  async function encode(
-    text: string,
-    vocabulary: TokenVocabularyId = 'default',
-  ): Promise<EncodeResult> {
+  async function encode(text: string): Promise<EncodeResult> {
     await ensureReady();
 
     const raw = textEncoder.encode(text);
@@ -53,26 +47,22 @@ export function createNya155Codec(adapter: CompressionAdapter) {
       codec: choice.codec,
       payload: choice.payload,
     });
-    const digits = bytesToBaseNDigitsNoPad(frame, getVocabularySize(vocabulary));
+    const digits = bytesToBaseNDigitsNoPad(frame, getVocabularySize());
 
     return {
-      cat: encodeDigitsToCat(digits, vocabulary),
+      cat: encodeDigitsToCat(digits),
       meta: buildMeta(
         choice.codec,
         digits.length,
-        vocabulary,
       ),
     };
   }
 
-  async function decode(
-    cat: string,
-    vocabulary: TokenVocabularyId = 'default',
-  ): Promise<DecodeResult> {
+  async function decode(cat: string): Promise<DecodeResult> {
     await ensureReady();
 
-    const digits = decodeCatToDigits(cat, vocabulary);
-    const frameBytes = baseNDigitsToBytesNoPad(digits, getVocabularySize(vocabulary));
+    const digits = decodeCatToDigits(cat);
+    const frameBytes = baseNDigitsToBytesNoPad(digits, getVocabularySize());
     const frame = unpackFrame(frameBytes);
     const raw = await adapter.decodePayload(frame.codec, frame.payload);
 
@@ -81,7 +71,6 @@ export function createNya155Codec(adapter: CompressionAdapter) {
       meta: buildMeta(
         frame.codec,
         digits.length,
-        vocabulary,
       ),
     };
   }

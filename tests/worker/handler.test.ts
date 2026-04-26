@@ -17,18 +17,18 @@ function createHandler() {
         wasmLoaded: true,
       };
     },
-    async encode(text, vocabulary) {
-      requests.push(`encode:${text}:${vocabulary}`);
+    async encode(text, ...rest) {
+      requests.push(`encode:${text}:${rest.length}`);
       return {
         cat: '！喵喵mew',
-        meta: { codec: 0, tokenCount: 3, vocabulary },
+        meta: { codec: 0, tokenCount: 3 },
       };
     },
-    async decode(cat, vocabulary) {
-      requests.push(`decode:${cat}:${vocabulary}`);
+    async decode(cat, ...rest) {
+      requests.push(`decode:${cat}:${rest.length}`);
       return {
         text: 'decoded',
-        meta: { codec: 1, tokenCount: 9, vocabulary },
+        meta: { codec: 1, tokenCount: 9 },
       };
     },
     sample() {
@@ -62,13 +62,13 @@ describe('worker handler', () => {
   it('routes encode/decode/sample requests', async () => {
     const { handler, requests } = createHandler();
 
-    await handler({ id: '2', type: 'encode', payload: { text: 'hello', vocabulary: 'expanded' } });
-    await handler({ id: '3', type: 'decode', payload: { cat: '！喵喵mew', vocabulary: 'expanded' } });
+    await handler({ id: '2', type: 'encode', payload: { text: 'hello' } });
+    await handler({ id: '3', type: 'decode', payload: { cat: '！喵喵mew' } });
     await handler({ id: '4', type: 'sample' });
 
     expect(requests).toEqual([
-      'encode:hello:expanded',
-      'decode:！喵喵mew:expanded',
+      'encode:hello:0',
+      'decode:！喵喵mew:0',
       'sample',
     ]);
   });

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { EXPANDED_TOKEN_TABLE, TOKEN_TABLE } from '../../src/protocol/tokens';
+import { TOKEN_TABLE } from '../../src/protocol/tokens';
 import { createTranslatorApp } from '../../src/ui/app';
 import type { AppService } from '../../src/ui/app';
 
@@ -23,7 +23,6 @@ function createService(overrides: Partial<AppService> = {}): AppService {
         meta: {
           codec: 1,
           tokenCount: 4,
-          vocabulary: 'default',
         },
       };
     },
@@ -33,7 +32,6 @@ function createService(overrides: Partial<AppService> = {}): AppService {
         meta: {
           codec: 1,
           tokenCount: 4,
-          vocabulary: 'default',
         },
       };
     },
@@ -116,6 +114,7 @@ describe('translator app', () => {
     expect(root.textContent).toContain('codec');
     expect(root.textContent).not.toContain('rawLength');
     expect(root.textContent).toContain('tokenCount');
+    expect(root.querySelector('[data-role="expanded-vocabulary-toggle"]')).toBeNull();
   });
 
   it('opens the current token vocabulary dialog from the capacity entry', async () => {
@@ -222,7 +221,7 @@ describe('translator app', () => {
     translate!.click();
     await flush();
 
-    expect(encode).toHaveBeenCalledWith('你好，猫猫', 'default');
+    expect(encode).toHaveBeenCalledWith('你好，猫猫');
     expect(output!.value).toBe('！喵喵mewMEW');
     expect(root.querySelector('[data-role="meta-codec"]')?.textContent).toBe('zstd-dict');
     expect(root.querySelector('[data-role="meta-token-count"]')?.textContent).toBe('4');
@@ -255,7 +254,7 @@ describe('translator app', () => {
       translate!.click();
       await flush();
 
-      expect(encode).toHaveBeenCalledWith('你好，猫猫', 'default');
+      expect(encode).toHaveBeenCalledWith('你好，猫猫');
       expect(output!.value).toBe('old cat text');
       expect(output!.classList.contains('is-output-replace-hiding')).toBe(true);
 
@@ -264,7 +263,6 @@ describe('translator app', () => {
         meta: {
           codec: 1,
           tokenCount: 4,
-          vocabulary: 'default',
         },
       });
       await flush();
@@ -317,7 +315,7 @@ describe('translator app', () => {
       translate!.click();
       await flush();
 
-      expect(decode).toHaveBeenCalledWith('！喵喵mewMEW', 'default');
+      expect(decode).toHaveBeenCalledWith('！喵喵mewMEW');
       expect(output!.value).toBe('你好，猫猫');
 
       vi.advanceTimersByTime(160);
@@ -468,7 +466,6 @@ describe('translator app', () => {
           meta: {
             codec: 1,
             tokenCount: 4,
-            vocabulary: 'default',
           },
         };
       },
@@ -517,57 +514,4 @@ describe('translator app', () => {
     expect(root.textContent).toContain('worker 初始化失败');
   });
 
-  it('toggles the expanded vocabulary from the top-right control and uses it for translation', async () => {
-    const root = document.createElement('div');
-    document.body.append(root);
-
-    const encode = vi.fn(async (_text: string, vocabulary = 'default') => ({
-      cat: vocabulary === 'expanded' ? 'mew! 喵喵? ' : '！喵喵mewMEW',
-      meta: {
-        codec: 1 as const,
-        tokenCount: vocabulary === 'expanded' ? 2 : 4,
-        vocabulary,
-      },
-    }));
-    const decode = vi.fn(createService().decode);
-    await createTranslatorApp(root, createService({ encode, decode }));
-    await flush();
-
-    const toggle = root.querySelector<HTMLButtonElement>('[data-role="expanded-vocabulary-toggle"]');
-    const trigger = root.querySelector<HTMLButtonElement>('[data-role="token-vocabulary-trigger"]');
-    const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
-    const translate = root.querySelector<HTMLButtonElement>('[data-role="translate"]');
-
-    expect(toggle).not.toBeNull();
-    expect(trigger).not.toBeNull();
-    expect(toggle!.textContent).toContain('8018');
-    expect(toggle!.getAttribute('aria-label')).toContain('8018');
-    expect(toggle!.getAttribute('aria-checked')).toBe('false');
-    expect(trigger!.textContent).toContain(String(TOKEN_TABLE.length));
-
-    toggle!.click();
-    await flush();
-
-    expect(toggle!.getAttribute('aria-checked')).toBe('true');
-    expect(trigger!.textContent).toContain(String(EXPANDED_TOKEN_TABLE.length));
-    expect(encode).toHaveBeenLastCalledWith('人在说啥', 'expanded');
-
-    input!.value = '你好，猫猫';
-    translate!.click();
-    await flush();
-
-    expect(encode).toHaveBeenLastCalledWith('你好，猫猫', 'expanded');
-    expect(root.querySelector<HTMLTextAreaElement>('[data-role="output"]')!.value).toBe('mew! 喵喵? ');
-
-    trigger!.click();
-
-    const dialog = root.querySelector<HTMLElement>('[data-role="token-vocabulary-dialog"]');
-    const items = root.querySelectorAll('[data-role="token-list-item"]');
-    const expandedTokenIndex = EXPANDED_TOKEN_TABLE.indexOf('mew! ');
-    const expandedToken = root.querySelector<HTMLElement>(`[data-token-index="${expandedTokenIndex}"]`);
-
-    expect(dialog?.textContent).toContain(`当前词表 / ${EXPANDED_TOKEN_TABLE.length} tokens`);
-    expect(items).toHaveLength(EXPANDED_TOKEN_TABLE.length);
-    expect(expandedToken?.textContent).toContain('mew! ');
-  });
 });
