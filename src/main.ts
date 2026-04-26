@@ -16,7 +16,7 @@ const client = createWorkerClient(worker);
 
 void createTranslatorApp(root, {
   ready: () => client.ready(),
-  encode: (text, vocabulary) => client.encode(text, vocabulary),
-  decode: (cat, vocabulary) => client.decode(cat, vocabulary),
+  encode: (text) => client.encode(text),
+  decode: (cat) => client.decode(cat),
   sample: () => client.sample(),
 });

@@ -1,7 +1,5 @@
 import { ProtocolError } from './errors';
 
-export type TokenVocabularyId = 'default' | 'expanded';
-
 export const TOKEN_TABLE = [
   '！', '～', '喵喵', '咪喵', '喵呜', '咪呜', '喵嗷', '咪嗷', '呼噜', '咕噜',
   'mew', 'MEW', 'Mew', 'meo', 'MEO', 'Meo', 'mia', 'MIA', 'Mia', 'mio',
@@ -22,85 +20,27 @@ export const TOKEN_TABLE = [
   '\n', ';', '；',
 ] as const;
 
-const ASCII_SUFFIX_TOKENS = [',', '!', '~', '?', ';'] as const;
-const EXPANDED_PUNCTUATION_TOKENS = ['!', '?'] as const;
-const MAX_EXPANDED_PUNCTUATION_LENGTH = 4;
-
-function isExpandableToken(token: string): boolean {
-  return /^[\p{Script=Han}]+$/u.test(token) || /^[A-Za-z]+$/.test(token);
-}
-
-function isRemovedAsciiSuffixToken(token: string): boolean {
-  return ASCII_SUFFIX_TOKENS.includes(token as typeof ASCII_SUFFIX_TOKENS[number]);
-}
-
-function buildPunctuationSequences(
-  alphabet: readonly string[],
-  maxLength: number,
-): string[] {
-  let current = [''];
-  const sequences: string[] = [];
-
-  for (let length = 1; length <= maxLength; length += 1) {
-    current = current.flatMap((prefix) => alphabet.map((token) => `${prefix}${token}`));
-    sequences.push(...current);
-  }
-
-  return sequences;
-}
-
-function buildExpandedTokenTable(source: readonly string[]): readonly string[] {
-  const expandableTokens = source.filter(isExpandableToken);
-  const punctuationSequences = buildPunctuationSequences(
-    EXPANDED_PUNCTUATION_TOKENS,
-    MAX_EXPANDED_PUNCTUATION_LENGTH,
-  );
-  const punctuatedTokens = expandableTokens
-    .flatMap((token) => punctuationSequences.map((suffix) => `${token}${suffix}`));
-  const spaceSuffixedTokens = [
-    ...expandableTokens.map((token) => `${token} `),
-    ...punctuatedTokens.map((token) => `${token} `),
-  ];
-  const retainedTokens = source.filter((token) => !isRemovedAsciiSuffixToken(token) && token !== ' ');
-
-  return [...retainedTokens, ...punctuatedTokens, ...spaceSuffixedTokens];
-}
-
 function buildTokensByLength(table: readonly string[]): { token: string; index: number }[] {
   return [...table]
     .map((token, index) => ({ token, index }))
     .sort((left, right) => right.token.length - left.token.length || left.index - right.index);
 }
 
-export const EXPANDED_TOKEN_TABLE = buildExpandedTokenTable(TOKEN_TABLE);
+const TOKENS_BY_LENGTH = buildTokensByLength(TOKEN_TABLE);
 
-const TOKEN_TABLES: Record<TokenVocabularyId, readonly string[]> = {
-  default: TOKEN_TABLE,
-  expanded: EXPANDED_TOKEN_TABLE,
-};
-
-const TOKENS_BY_LENGTH: Record<TokenVocabularyId, { token: string; index: number }[]> = {
-  default: buildTokensByLength(TOKEN_TABLE),
-  expanded: buildTokensByLength(EXPANDED_TOKEN_TABLE),
-};
-
-export function getTokenTable(vocabulary: TokenVocabularyId = 'default'): readonly string[] {
-  return TOKEN_TABLES[vocabulary];
+export function getTokenTable(): readonly string[] {
+  return TOKEN_TABLE;
 }
 
-export function getVocabularySize(vocabulary: TokenVocabularyId = 'default'): number {
-  return getTokenTable(vocabulary).length;
+export function getVocabularySize(): number {
+  return TOKEN_TABLE.length;
 }
 
-export function encodeDigitsToCat(
-  digits: number[],
-  vocabulary: TokenVocabularyId = 'default',
-): string {
-  const table = getTokenTable(vocabulary);
+export function encodeDigitsToCat(digits: number[]): string {
   const chunks: string[] = [];
 
   for (const digit of digits) {
-    const token = table[digit];
+    const token = TOKEN_TABLE[digit];
     if (token === undefined) {
       throw new ProtocolError('digit 超出 token 表范围。', 'invalid-input');
     }
@@ -110,15 +50,11 @@ export function encodeDigitsToCat(
   return chunks.join('');
 }
 
-export function decodeCatToDigits(
-  cat: string,
-  vocabulary: TokenVocabularyId = 'default',
-): number[] {
-  const tokensByLength = TOKENS_BY_LENGTH[vocabulary];
+export function decodeCatToDigits(cat: string): number[] {
   const digits: number[] = [];
 
   for (let index = 0; index < cat.length;) {
-    const match = tokensByLength.find(({ token }) => cat.startsWith(token, index));
+    const match = TOKENS_BY_LENGTH.find(({ token }) => cat.startsWith(token, index));
 
     if (!match) {
       throw new ProtocolError(`未知 token: ${cat.slice(index, index + 3)}`, 'invalid-input');

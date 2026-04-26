@@ -68,6 +68,8 @@ describe('nya155 codec', () => {
     expect(decoded.text).toBe(text);
     expect(encoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat).length);
     expect(decoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat).length);
+    expect(encoded.meta).not.toHaveProperty('vocabulary');
+    expect(decoded.meta).not.toHaveProperty('vocabulary');
   });
 
   it('selects zstd-dict when the adapter produces a shorter payload', async () => {
@@ -109,17 +111,4 @@ describe('nya155 codec', () => {
     expect(longEncoded.meta.tokenCount).toBe(decodeCatToDigits(longEncoded.cat).length);
   });
 
-  it('round-trips using the expanded 8018-token vocabulary when requested', async () => {
-    const codec = createNya155Codec(createRawCompressionAdapter());
-    const text = '8018 词表：你好，mew!?!? ';
-
-    const encoded = await codec.encode(text, 'expanded');
-    const decoded = await codec.decode(encoded.cat, 'expanded');
-
-    expect(decoded.text).toBe(text);
-    expect(encoded.meta.vocabulary).toBe('expanded');
-    expect(decoded.meta.vocabulary).toBe('expanded');
-    expect(encoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat, 'expanded').length);
-    expect(encoded.cat).toContain('!');
-  });
 });
