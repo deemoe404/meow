@@ -137,8 +137,9 @@ describe('translator app', () => {
     const items = root.querySelectorAll('[data-role="token-list-item"]');
     const firstItem = root.querySelector<HTMLElement>('[data-token-index="0"]');
     const spaceIndex = TOKEN_TABLE.indexOf(' ');
+    const suffixSpaceIndex = TOKEN_TABLE.indexOf('！ ');
     const newlineIndex = TOKEN_TABLE.indexOf('\n');
-    const spaceItem = root.querySelector<HTMLElement>(`[data-token-index="${spaceIndex}"]`);
+    const suffixSpaceItem = root.querySelector<HTMLElement>(`[data-token-index="${suffixSpaceIndex}"]`);
     const newlineItem = root.querySelector<HTMLElement>(`[data-token-index="${newlineIndex}"]`);
     const lastItem = root.querySelector<HTMLElement>(`[data-token-index="${TOKEN_TABLE.length - 1}"]`);
 
@@ -148,14 +149,15 @@ describe('translator app', () => {
     expect(dialog!.getAttribute('aria-modal')).toBe('true');
     expect(dialog!.textContent).toContain(`当前词表 / ${TOKEN_TABLE.length} tokens`);
     expect(items).toHaveLength(TOKEN_TABLE.length);
+    expect(spaceIndex).toBe(-1);
     expect(firstItem?.textContent).toContain('0');
     expect(firstItem?.textContent).toContain(TOKEN_TABLE[0]);
-    expect(spaceItem?.textContent).toContain(String(spaceIndex));
-    expect(spaceItem?.textContent).toContain('空格 (" ")');
+    expect(suffixSpaceItem?.textContent).toContain(String(suffixSpaceIndex));
+    expect(suffixSpaceItem?.textContent).toContain('！ + 空格');
     expect(newlineItem?.textContent).toContain(String(newlineIndex));
     expect(newlineItem?.textContent).toContain('换行 ("\\n")');
     expect(lastItem?.textContent).toContain(String(TOKEN_TABLE.length - 1));
-    expect(lastItem?.textContent).toContain(TOKEN_TABLE[TOKEN_TABLE.length - 1]);
+    expect(lastItem?.textContent).toContain('嗷喵 + 空格');
   });
 
   it('animates the token vocabulary dialog closed before removing it and restoring focus', async () => {

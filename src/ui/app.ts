@@ -41,6 +41,10 @@ function tokenDisplayValue(token: string): string {
     return '换行 ("\\n")';
   }
 
+  if (token.endsWith(' ')) {
+    return `${tokenDisplayValue(token.slice(0, -1))} + 空格`;
+  }
+
   return token;
 }
 
