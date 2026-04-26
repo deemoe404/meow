@@ -150,6 +150,47 @@ textarea:focus-visible {
   z-index: 32;
   display: inline-flex;
   align-items: center;
+  gap: 10px;
+}
+
+.github-repo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(244, 162, 97, 0.16);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 50% 40% 60% 40% / 40% 50% 40% 60%;
+  box-shadow: 0 8px 24px rgba(38, 70, 83, 0.07);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.github-repo-link .icon {
+  font-size: 23px;
+}
+
+.github-repo-link:hover {
+  color: var(--primary-ink);
+  background: rgba(255, 250, 244, 0.94);
+  box-shadow: 0 12px 32px rgba(38, 70, 83, 0.11);
+  transform: translateY(-1px) rotate(-4deg);
+}
+
+.github-repo-link:active {
+  transform: translateY(1px) rotate(-2deg) scale(0.95);
+}
+
+.github-repo-link:focus-visible {
+  outline: 2px solid rgba(244, 162, 97, 0.42);
+  outline-offset: 3px;
 }
 
 .token-vocabulary-trigger {
@@ -1099,6 +1140,16 @@ textarea[readonly]::placeholder {
   .vocabulary-controls {
     top: max(10px, env(safe-area-inset-top));
     right: 10px;
+    gap: 7px;
+  }
+
+  .github-repo-link {
+    width: 38px;
+    height: 38px;
+  }
+
+  .github-repo-link .icon {
+    font-size: 20px;
   }
 
   .token-vocabulary-trigger {

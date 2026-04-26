@@ -8,6 +8,7 @@ import type { WorkerReadyResult } from '../worker/messages';
 type Direction = 'human-to-cat' | 'cat-to-human';
 const TOKEN_VOCABULARY_CLOSE_MS = 220;
 const HERO_TAGLINE_SOURCE = '人在说啥';
+const GITHUB_REPO_URL = 'https://github.com/deemoe404/meow';
 
 export interface AppService {
   ready(): Promise<WorkerReadyResult>;
@@ -48,7 +49,7 @@ function tokenDisplayValue(token: string): string {
   return token;
 }
 
-type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share';
+type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share' | 'github';
 
 function icon(name: IconName): string {
   const icons: Record<IconName, string> = {
@@ -89,6 +90,11 @@ function icon(name: IconName): string {
         <path d="M17.3 15.25c1.9 0 3.45 1.55 3.45 3.45s-1.55 3.45-3.45 3.45-3.45-1.55-3.45-3.45c0-.25.03-.5.08-.74l-6.5-3.4a3.42 3.42 0 0 1-2.48 1.06A3.46 3.46 0 0 1 1.5 12.17a3.46 3.46 0 0 1 3.45-3.45c.96 0 1.83.39 2.46 1.02l6.54-3.48a3.47 3.47 0 0 1-.1-.82 3.46 3.46 0 0 1 3.45-3.45 3.46 3.46 0 0 1 3.45 3.45 3.46 3.46 0 0 1-3.45 3.45c-.96 0-1.83-.39-2.46-1.02L8.3 11.35c.06.26.1.53.1.82 0 .27-.03.54-.1.79l6.52 3.41a3.42 3.42 0 0 1 2.48-1.12Zm0 2a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9ZM4.95 10.72a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9ZM17.3 3.99a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9Z" />
       </svg>
     `,
+    github: `
+      <svg class="icon icon--github" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M12 2.25c-5.38 0-9.75 4.37-9.75 9.75 0 4.3 2.79 7.95 6.66 9.24.49.09.67-.21.67-.47v-1.72c-2.71.59-3.28-1.17-3.28-1.17-.44-1.13-1.08-1.43-1.08-1.43-.89-.61.07-.6.07-.6.98.07 1.49 1.01 1.49 1.01.87 1.49 2.28 1.06 2.84.81.09-.63.34-1.06.62-1.3-2.16-.25-4.44-1.08-4.44-4.82 0-1.06.38-1.94 1.01-2.62-.1-.25-.44-1.24.1-2.58 0 0 .82-.26 2.68 1 .78-.22 1.6-.33 2.43-.33s1.65.11 2.43.33c1.86-1.26 2.68-1 2.68-1 .54 1.34.2 2.33.1 2.58.63.68 1.01 1.56 1.01 2.62 0 3.75-2.28 4.57-4.45 4.82.35.3.66.9.66 1.82v2.7c0 .26.18.57.68.47A9.76 9.76 0 0 0 21.75 12c0-5.38-4.37-9.75-9.75-9.75Z" />
+      </svg>
+    `,
   };
 
   return icons[name];
@@ -105,6 +111,16 @@ export async function createTranslatorApp(
       <div class="ambient ambient--sand" aria-hidden="true"></div>
 
       <div class="vocabulary-controls" data-role="vocabulary-controls">
+        <a
+          class="github-repo-link"
+          data-role="github-repo-link"
+          href="${GITHUB_REPO_URL}"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="在 GitHub 打开 meow 仓库"
+        >
+          ${icon('github')}
+        </a>
         <button
           class="token-vocabulary-trigger"
           type="button"
