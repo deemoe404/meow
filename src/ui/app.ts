@@ -277,7 +277,7 @@ export async function createTranslatorApp(
       window.clearTimeout(textSwapRevealTimer);
       textSwapRevealTimer = null;
     }
-    app.querySelectorAll('.text-swap-ghost').forEach((ghost) => ghost.remove());
+    root.querySelectorAll('.text-swap-ghost').forEach((ghost) => ghost.remove());
     input.classList.remove('is-text-swap-live-hidden');
     output.classList.remove('is-text-swap-live-hidden');
     input.classList.remove('is-text-swap-live-revealing');
@@ -500,7 +500,7 @@ export async function createTranslatorApp(
     ghost.style.height = `${from.height}px`;
     ghost.style.setProperty('--text-swap-x', `${to.left - from.left}px`);
     ghost.style.setProperty('--text-swap-y', `${to.top - from.top}px`);
-    app.append(ghost);
+    root.append(ghost);
   };
 
   const runTextSwapGhosts = (
