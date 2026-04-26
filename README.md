@@ -1,12 +1,12 @@
 # 猫语翻译器
 
-一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya155-zh11`。
+一个部署到 GitHub Pages 的静态单页网站，实现可逆猫语协议 `nya171-zh12`。
 
 ## 特性
 
 - 任意 Unicode 文本 `-> UTF-8 -> codec frame -> baseN digit -> 猫语 token`
 - `raw` 与 `zstd-dict` 双 codec，编码时自动选择更短 payload
-- 固定 155-token 猫语词表，所有 token 都直接承载 payload
+- 固定 171-token 猫语词表，所有 token 都直接承载 payload
 - 浏览器本地编解码，无服务端依赖
 - 主线程 UI + Web Worker 协议内核，避免压缩和 wasm 初始化卡住页面
 - 中文主文案、简化版猫系视觉、支持 GitHub Pages 相对路径部署
@@ -36,14 +36,14 @@ pnpm run assets:social
 
 ## 协议说明
 
-`nya155-zh11` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～`、全角 `；` 与 `〜`。
+`nya171-zh12` 保持原始 Unicode，不做 NFC / NFKC 归一化，也不折叠全角 `！`、全角 `～`、全角 `；` 与 `〜`。
 
 编码流程：
 
 1. 文本按原样转成 UTF-8 字节
 2. 同时尝试 `raw` 与 `zstd-dict`
 3. 打包为极简 codec frame：首字节是 codec tag，剩余字节全部视为 payload
-4. codec frame 走无 padding 的 base155 digit 切片
+4. codec frame 走无 padding 的 base171 digit 切片
 5. digit 直接映射到当前词表，输出串中的每个 token 都承载 payload
 
 协议内部的 `CodecId` 与 wire tag 分开表示：UI / meta 中的 codec id 使用 `0 raw`、`1 zstd-dict`；写入 codec frame 首字节的 wire tag 固定为：
@@ -55,7 +55,7 @@ pnpm run assets:social
 
 ## 词表
 
-默认 155-token 词表固定顺序如下：
+默认 171-token 词表固定顺序如下：
 
 ```text
 0 ！   1 ～   2 喵喵 3 咪喵 4 喵呜 5 咪呜 6 喵嗷 7 咪嗷 8 呼噜 9 咕噜
@@ -75,6 +75,8 @@ pnpm run assets:social
 132 … 133 , 134 ， 135 ! 136 ~ 137 、 138 ？ 139 ? 140 ... 141 。。。 142 <space>
 143 (^_^) 144 (^o^) 145 (^w^) 146 (^ω^) 147 (^x^) 148 (^ェ^) 149 (^ﻌ^) 150 (•ω•) 151 (•ᆺ•)
 152 <newline> 153 ; 154 ；
+155 🐱 156 🐈 157 🐈‍⬛ 158 🐅 159 🐆 160 🦁 161 😺 162 😸 163 😹 164 😻
+165 😼 166 😽 167 🙀 168 😿 169 😾 170 🐾
 ```
 
 其中 `<newline>` 表示 U+000A 换行符 `\n`，`<space>` 表示 U+0020 空格。
