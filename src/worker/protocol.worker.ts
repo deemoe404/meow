@@ -2,12 +2,12 @@
 
 import { SAMPLE_TEXTS } from '../content/samples';
 import { createBrowserCompressionAdapter } from '../protocol/browser-compression';
-import { createNya171Codec } from '../protocol/nya171';
+import { createNya256Codec } from '../protocol/nya256';
 import { createWorkerHandler } from './handler';
 import type { CodecInfo, WorkerRequest, WorkerResponse } from './messages';
 
 const compression = createBrowserCompressionAdapter();
-const codec = createNya171Codec(compression);
+const codec = createNya256Codec(compression);
 
 function codecInfo(name: 'raw' | 'zstd-dict'): CodecInfo {
   switch (name) {
