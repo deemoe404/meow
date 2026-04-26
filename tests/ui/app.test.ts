@@ -443,6 +443,32 @@ describe('translator app', () => {
     }
   });
 
+  it('mounts text swap ghosts outside the transformed app container', async () => {
+    vi.useFakeTimers();
+    try {
+      const root = document.createElement('div');
+      document.body.append(root);
+
+      await createTranslatorApp(root, createService());
+
+      const app = root.querySelector<HTMLElement>('.feline-app');
+      const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+      const reverse = root.querySelector<HTMLButtonElement>('[data-role="direction-toggle"]');
+      const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+      input!.value = '你好，猫猫';
+      output!.value = '！喵喵mewMEW';
+      reverse!.click();
+
+      const ghosts = root.querySelectorAll('[data-role="text-swap-ghost"]');
+      expect(ghosts).toHaveLength(2);
+      expect(app!.querySelectorAll('[data-role="text-swap-ghost"]')).toHaveLength(0);
+      expect([...ghosts].every((ghost) => ghost.parentElement === root)).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('renders only one text swap ghost when only one panel has text', async () => {
     vi.useFakeTimers();
     try {
