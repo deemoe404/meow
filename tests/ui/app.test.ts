@@ -115,6 +115,15 @@ describe('translator app', () => {
     expect(root.textContent).not.toContain('rawLength');
     expect(root.textContent).toContain('tokenCount');
     expect(root.querySelector('[data-role="expanded-vocabulary-toggle"]')).toBeNull();
+
+    const repoLink = root.querySelector<HTMLAnchorElement>('[data-role="github-repo-link"]');
+    expect(repoLink).not.toBeNull();
+    expect(repoLink!.href).toBe('https://github.com/deemoe404/meow');
+    expect(repoLink!.target).toBe('_blank');
+    expect(repoLink!.rel).toBe('noreferrer');
+    expect(repoLink!.getAttribute('aria-label')).toBe('在 GitHub 打开 meow 仓库');
+    expect(repoLink!.textContent?.trim()).toBe('');
+    expect(repoLink!.querySelector('svg.icon--github')).not.toBeNull();
   });
 
   it('opens the current token vocabulary dialog from the capacity entry', async () => {
