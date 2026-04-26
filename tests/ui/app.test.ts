@@ -329,6 +329,75 @@ describe('translator app', () => {
     }
   });
 
+  it('silently ignores non-cat clipboard text on window focus', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    vi.mocked(navigator.clipboard.readText).mockResolvedValueOnce('普通剪贴板内容');
+    const decode = vi.fn(async () => {
+      throw new Error('未知 token');
+    });
+
+    await createTranslatorApp(root, createService({ decode }));
+    await flush();
+
+    const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+    const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+    input!.value = '保留原输入';
+    input!.dispatchEvent(new Event('input', { bubbles: true }));
+    window.dispatchEvent(new FocusEvent('focus'));
+    await flush();
+    await flush();
+
+    expect(navigator.clipboard.readText).toHaveBeenCalled();
+    expect(decode).toHaveBeenCalledWith('普通剪贴板内容');
+    expect(root.querySelector('.feline-app')?.classList.contains('is-cat-to-human')).toBe(false);
+    expect(input!.value).toBe('保留原输入');
+    expect(output!.value).toBe('');
+    expect(root.querySelector('[data-role="error"]')?.textContent).toBe('');
+  });
+
+  it('translates valid cat-language clipboard text when the window receives focus', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    const catClipboard = '！喵喵mewMEW';
+    vi.mocked(navigator.clipboard.readText).mockResolvedValueOnce(catClipboard);
+    const decode = vi.fn(async (cat: string) => ({
+      text: `decoded:${cat}`,
+      meta: {
+        codec: 1 as const,
+        tokenCount: 4,
+      },
+    }));
+
+    await createTranslatorApp(root, createService({ decode }));
+    await flush();
+
+    const input = root.querySelector<HTMLTextAreaElement>('[data-role="input"]');
+    const output = root.querySelector<HTMLTextAreaElement>('[data-role="output"]');
+
+    input!.value = '原来的人话';
+    output!.value = '原来的猫语';
+    window.dispatchEvent(new FocusEvent('focus'));
+    await flush();
+    await flush();
+
+    expect(navigator.clipboard.readText).toHaveBeenCalled();
+    expect(decode).toHaveBeenCalledWith(catClipboard);
+    expect(root.querySelector('.feline-app')?.classList.contains('is-cat-to-human')).toBe(true);
+    expect(input!.value).toBe(catClipboard);
+    expect(output!.value).toBe(`decoded:${catClipboard}`);
+    expect(input!.classList.contains('text-content--cat')).toBe(true);
+    expect(output!.classList.contains('text-content--chinese')).toBe(true);
+    expect(input!.placeholder).toBe('输入要翻译的猫语...');
+    expect(output!.placeholder).toBe('翻译后的人话会出现在这里...');
+    expect(root.querySelector('[data-role="input-count"]')?.textContent).toBe(`${catClipboard.length} / 5000`);
+    expect(root.querySelector('[data-role="meta-codec"]')?.textContent).toBe('zstd-dict');
+    expect(root.querySelector('[data-role="meta-token-count"]')?.textContent).toBe('4');
+  });
+
   it('renders two temporary text swap ghosts while switching filled panels', async () => {
     vi.useFakeTimers();
     try {

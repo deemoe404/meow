@@ -257,6 +257,8 @@ export async function createTranslatorApp(
   let tokenVocabularyCloseTimer: number | null = null;
   let translateRunId = 0;
   let heroRunId = 0;
+  let clipboardFocusRunId = 0;
+  let runtimeReady = false;
   translate.disabled = true;
 
   const prefersReducedMotion = () =>
@@ -649,6 +651,62 @@ export async function createTranslatorApp(
     }
   };
 
+  const applyClipboardDecode = (
+    cat: string,
+    result: DecodeResult,
+  ) => {
+    translateRunId += 1;
+    cleanupOutputReplaceTransition();
+    setError(null);
+
+    if (direction !== 'cat-to-human') {
+      direction = 'cat-to-human';
+      renderDirection();
+    }
+
+    input.value = cat;
+    output.value = result.text;
+    updateInputCount();
+    setMeta(result);
+  };
+
+  const tryDecodeClipboardOnFocus = async () => {
+    if (!runtimeReady || !root.isConnected || document.hidden) {
+      return;
+    }
+
+    const readText = navigator.clipboard?.readText;
+    if (typeof readText !== 'function') {
+      return;
+    }
+
+    const runId = ++clipboardFocusRunId;
+    let clipboardText: string;
+    try {
+      clipboardText = await readText.call(navigator.clipboard);
+    } catch {
+      return;
+    }
+
+    if (
+      runId !== clipboardFocusRunId ||
+      !root.isConnected ||
+      clipboardText.length === 0 ||
+      clipboardText.length > input.maxLength
+    ) {
+      return;
+    }
+
+    try {
+      const result = await service.decode(clipboardText);
+      if (runId === clipboardFocusRunId && root.isConnected) {
+        applyClipboardDecode(clipboardText, result);
+      }
+    } catch {
+      // Most clipboard contents are not cat-language payloads. Leave the current workspace untouched.
+    }
+  };
+
   const updateInputCount = () => {
     inputCount.textContent = `${input.value.length} / 5000`;
   };
@@ -737,6 +795,10 @@ export async function createTranslatorApp(
     const ready = await service.ready();
     status.textContent = `就绪：${ready.codecs.map((codec) => codec.name).join(' / ')}`;
     translate.disabled = false;
+    runtimeReady = true;
+    window.addEventListener('focus', () => {
+      void tryDecodeClipboardOnFocus();
+    });
     updateHeroTagline();
   } catch (err) {
     status.textContent = '运行时不可用';
