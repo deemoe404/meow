@@ -46,7 +46,26 @@ const EXPECTED_FACE_TOKENS = [
   '(•ᆺ•)',
 ] as const;
 
-describe('nya155 token table', () => {
+const EXPECTED_CAT_EMOJI_TOKENS = [
+  '🐱',
+  '🐈',
+  '🐈‍⬛',
+  '🐅',
+  '🐆',
+  '🦁',
+  '😺',
+  '😸',
+  '😹',
+  '😻',
+  '😼',
+  '😽',
+  '🙀',
+  '😿',
+  '😾',
+  '🐾',
+] as const;
+
+describe('nya171 token table', () => {
   it('encodes and decodes deterministically across the full table', () => {
     const digits = Array.from({ length: TOKEN_TABLE.length }, (_, index) => index);
     const cat = encodeDigitsToCat(digits);
@@ -55,19 +74,17 @@ describe('nya155 token table', () => {
     expect(restored).toEqual(digits);
   });
 
-  it('keeps token prefixes unambiguous for no-separator decoding', () => {
-    expect(TOKEN_TABLE).toHaveLength(155);
+  it('keeps no-separator decoding reversible with longest-match tokens', () => {
+    expect(TOKEN_TABLE).toHaveLength(171);
+    expect('🐈‍⬛'.startsWith('🐈')).toBe(true);
 
-    for (const [leftIndex, left] of TOKEN_TABLE.entries()) {
-      for (const [rightIndex, right] of TOKEN_TABLE.entries()) {
-        if (leftIndex === rightIndex) {
-          continue;
-        }
+    const catIndex = TOKEN_TABLE.indexOf('🐈');
+    const blackCatIndex = TOKEN_TABLE.indexOf('🐈‍⬛');
+    const digits = [blackCatIndex, catIndex, blackCatIndex];
 
-        expect(left.startsWith(right)).toBe(false);
-        expect(right.startsWith(left)).toBe(false);
-      }
-    }
+    expect(catIndex).toBeGreaterThanOrEqual(0);
+    expect(blackCatIndex).toBeGreaterThanOrEqual(0);
+    expect(decodeCatToDigits(encodeDigitsToCat(digits))).toEqual(digits);
   });
 
   it('round-trips mixed punctuation, CJK, and ASCII tokens', () => {
@@ -78,8 +95,8 @@ describe('nya155 token table', () => {
     expect(decodeCatToDigits(cat)).toEqual(digits);
   });
 
-  it('exposes the expected 155-token values and ordering', () => {
-    expect(TOKEN_TABLE).toHaveLength(155);
+  it('exposes the expected 171-token values and ordering', () => {
+    expect(TOKEN_TABLE).toHaveLength(171);
     expect(TOKEN_TABLE.slice(0, 10)).toEqual([
       '！', '～', '喵喵', '咪喵', '喵呜', '咪呜', '喵嗷', '咪嗷', '呼噜', '咕噜',
     ]);
@@ -94,7 +111,8 @@ describe('nya155 token table', () => {
     ]);
     expect(TOKEN_TABLE.slice(143, 152)).toEqual(EXPECTED_FACE_TOKENS);
     expect(TOKEN_TABLE[151]).toBe('(•ᆺ•)');
-    expect(TOKEN_TABLE.slice(152)).toEqual(['\n', ';', '；']);
+    expect(TOKEN_TABLE.slice(152, 155)).toEqual(['\n', ';', '；']);
+    expect(TOKEN_TABLE.slice(155)).toEqual(EXPECTED_CAT_EMOJI_TOKENS);
     expect(TOKEN_TABLE).not.toContain('(=^.^=)');
     expect(TOKEN_TABLE).not.toContain('（=^.^=）');
   });
