@@ -1,5 +1,6 @@
 import {
   compactDigitToSymbol,
+  getCompactSyllableCount,
   getCompactVocabularySize,
 } from '../protocol/compact-transport';
 import type { EncodeResult, DecodeResult } from '../protocol/types';
@@ -111,7 +112,7 @@ export async function createTranslatorApp(
           data-role="token-vocabulary-trigger"
           aria-haspopup="dialog"
           aria-expanded="false"
-          aria-label="查看当前短码，共 ${getCompactVocabularySize()} 个 symbol"
+          aria-label="查看当前猫语短码，共 ${getCompactVocabularySize()} 个 token"
         >
           <span>短码</span>
           <strong data-role="token-vocabulary-count">${getCompactVocabularySize()}</strong>
@@ -190,7 +191,7 @@ export async function createTranslatorApp(
           <div class="meta-row" aria-live="polite">
             <span class="runtime-status" data-role="status">初始化中</span>
             <span>codec <strong data-role="meta-codec">-</strong></span>
-            <span>symbolCount <strong data-role="meta-token-count">-</strong></span>
+            <span>tokenCount <strong data-role="meta-token-count">-</strong></span>
           </div>
           <div class="sr-only">
             <button type="button" data-role="sample">示例</button>
@@ -354,7 +355,7 @@ export async function createTranslatorApp(
 
     const title = document.createElement('h2');
     title.id = 'token-vocabulary-title';
-    title.textContent = `当前短码 / ${getCompactVocabularySize()} symbols`;
+    title.textContent = `当前猫语短码 / ${getCompactVocabularySize()} tokens`;
 
     const close = document.createElement('button');
     close.className = 'token-vocabulary-close';
@@ -369,7 +370,7 @@ export async function createTranslatorApp(
     const summary = document.createElement('p');
     summary.className = 'token-vocabulary-summary';
     summary.dataset.role = 'compact-vocabulary-summary';
-    summary.textContent = `短码范围 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}；每个 symbol 承载 14 bit，输出不再带格式魔数。`;
+    summary.textContent = `${getCompactSyllableCount()} 个猫系音节两两组合；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 10 bit，输出不再带格式魔数。`;
 
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) {
@@ -609,7 +610,7 @@ export async function createTranslatorApp(
   const renderVocabularyControls = () => {
     const count = getCompactVocabularySize();
 
-    tokenVocabularyTrigger.setAttribute('aria-label', `查看当前短码，共 ${count} 个 symbol`);
+    tokenVocabularyTrigger.setAttribute('aria-label', `查看当前猫语短码，共 ${count} 个 token`);
     tokenVocabularyCount.textContent = String(count);
   };
 

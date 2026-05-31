@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   COMPACT_BASE,
-  COMPACT_OFFSET,
+  COMPACT_SYLLABLE_ALPHABET,
   compactDigitToSymbol,
   decodeCompactCatToBytes,
   encodeBytesToCompactCat,
   getCompactCatDigitCount,
+  getCompactSyllableCount,
   getCompactVocabularySize,
 } from '../../src/protocol/compact-transport';
 
@@ -20,25 +21,26 @@ describe('compact cat transport', () => {
     }
   });
 
-  it('uses a 14-bit BMP alphabet without a compact magic prefix', () => {
+  it('uses cat-syllable pairs without a compact magic prefix', () => {
     const cat = encodeBytesToCompactCat(Uint8Array.from([1, 2, 3, 4, 5]));
+    const syllables = new Set(COMPACT_SYLLABLE_ALPHABET);
 
-    expect(getCompactVocabularySize()).toBe(16_384);
-    expect(getCompactCatDigitCount(cat)).toBe(cat.length);
-    expect(compactDigitToSymbol(0).charCodeAt(0)).toBe(COMPACT_OFFSET);
-    expect(compactDigitToSymbol(COMPACT_BASE - 1).charCodeAt(0)).toBe(COMPACT_OFFSET + COMPACT_BASE - 1);
+    expect(getCompactSyllableCount()).toBe(32);
+    expect(getCompactVocabularySize()).toBe(1_024);
+    expect(getCompactCatDigitCount(cat)).toBe(cat.length / 2);
+    expect(compactDigitToSymbol(0)).toBe('喵喵');
+    expect(compactDigitToSymbol(COMPACT_BASE - 1)).toBe('团团');
+    expect(cat.length % 2).toBe(0);
 
     for (let index = 0; index < cat.length; index += 1) {
-      const code = cat.charCodeAt(index);
-
-      expect(code).toBeGreaterThanOrEqual(COMPACT_OFFSET);
-      expect(code).toBeLessThan(COMPACT_OFFSET + COMPACT_BASE);
+      expect(syllables.has(cat[index] as typeof COMPACT_SYLLABLE_ALPHABET[number])).toBe(true);
     }
   });
 
   it('rejects non-compact and out-of-alphabet input', () => {
     expect(() => decodeCompactCatToBytes('！！')).toThrowError(/compact/i);
     expect(() => decodeCompactCatToBytes('abc')).toThrowError(/compact/i);
+    expect(() => decodeCompactCatToBytes('喵')).toThrowError(/偶数/i);
     expect(() => compactDigitToSymbol(COMPACT_BASE)).toThrowError(/digit/i);
   });
 });

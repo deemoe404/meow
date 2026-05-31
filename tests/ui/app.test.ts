@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   compactDigitToSymbol,
+  getCompactSyllableCount,
   getCompactVocabularySize,
 } from '../../src/protocol/compact-transport';
 import { createTranslatorApp } from '../../src/ui/app';
@@ -116,7 +117,7 @@ describe('translator app', () => {
     expect(root.textContent).not.toContain('PURRFECT MATCH');
     expect(root.textContent).toContain('codec');
     expect(root.textContent).not.toContain('rawLength');
-    expect(root.textContent).toContain('symbolCount');
+    expect(root.textContent).toContain('tokenCount');
     expect(root.querySelector('[data-role="expanded-vocabulary-toggle"]')).toBeNull();
 
     const repoLink = root.querySelector<HTMLAnchorElement>('[data-role="github-repo-link"]');
@@ -152,9 +153,11 @@ describe('translator app', () => {
     expect(dialog).not.toBeNull();
     expect(dialog!.getAttribute('role')).toBe('dialog');
     expect(dialog!.getAttribute('aria-modal')).toBe('true');
-    expect(dialog!.textContent).toContain(`当前短码 / ${getCompactVocabularySize()} symbols`);
+    expect(dialog!.textContent).toContain(`当前猫语短码 / ${getCompactVocabularySize()} tokens`);
     expect(summary).not.toBeNull();
-    expect(summary!.textContent).toContain(`短码范围 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}`);
+    expect(summary!.textContent).toContain(`${getCompactSyllableCount()} 个猫系音节两两组合`);
+    expect(summary!.textContent).toContain(`示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}`);
+    expect(summary!.textContent).toContain('每个 token 承载 10 bit');
     expect(summary!.textContent).toContain('输出不再带格式魔数');
     expect(root.querySelectorAll('[data-role="token-list-item"]')).toHaveLength(0);
   });
