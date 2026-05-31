@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import {
   COMPACT_BASE,
+  COMPACT_ENGLISH_CAT_CALLS,
   COMPACT_SYLLABLE_ALPHABET,
+  COMPACT_TOKEN_TABLE,
   compactDigitToSymbol,
   decodeCompactCatToBytes,
   encodeBytesToCompactCat,
   getCompactCatDigitCount,
+  getCompactChineseTokenCount,
+  getCompactEnglishTokenCount,
   getCompactSyllableCount,
   getCompactVocabularySize,
 } from '../../src/protocol/compact-transport';
@@ -21,27 +25,40 @@ describe('compact cat transport', () => {
     }
   });
 
-  it('uses cat-syllable trigrams without a compact magic prefix', () => {
+  it('uses a mixed 4096-token cat vocabulary without a compact magic prefix', () => {
     const cat = encodeBytesToCompactCat(Uint8Array.from([1, 2, 3, 4, 5]));
-    const syllables = new Set(COMPACT_SYLLABLE_ALPHABET);
+    const tokenSet = new Set(COMPACT_TOKEN_TABLE);
 
     expect(getCompactSyllableCount()).toBe(16);
-    expect(getCompactVocabularySize()).toBe(1_024);
+    expect(getCompactVocabularySize()).toBe(4_096);
+    expect(getCompactChineseTokenCount()).toBe(3_840);
+    expect(getCompactEnglishTokenCount()).toBe(256);
     expect(getCompactCatDigitCount(cat)).toBe(cat.length / 3);
     expect(compactDigitToSymbol(0)).toBe('喵喵喵');
-    expect(compactDigitToSymbol(COMPACT_BASE - 1)).toBe('嗷嗚嗚');
+    expect(compactDigitToSymbol(getCompactChineseTokenCount())).toBe('meo');
+    expect(COMPACT_TOKEN_TABLE).toHaveLength(COMPACT_BASE);
+    expect(tokenSet.size).toBe(COMPACT_BASE);
+    expect(COMPACT_TOKEN_TABLE.every((token) => token.length === 3)).toBe(true);
+    expect(COMPACT_ENGLISH_CAT_CALLS).toEqual(expect.arrayContaining([
+      'meo', 'mow', 'mia', 'aoo', 'aou', 'nya', 'mrr', 'prr', 'pur',
+    ]));
     expect(cat.length % 3).toBe(0);
+    expect(cat.startsWith('喵:')).toBe(false);
 
-    for (let index = 0; index < cat.length; index += 1) {
-      expect(syllables.has(cat[index] as typeof COMPACT_SYLLABLE_ALPHABET[number])).toBe(true);
+    for (let index = 0; index < getCompactChineseTokenCount(); index += 1) {
+      const token = compactDigitToSymbol(index);
+
+      expect(COMPACT_SYLLABLE_ALPHABET).toContain(token[0] as typeof COMPACT_SYLLABLE_ALPHABET[number]);
+      expect(COMPACT_SYLLABLE_ALPHABET).toContain(token[1] as typeof COMPACT_SYLLABLE_ALPHABET[number]);
+      expect(COMPACT_SYLLABLE_ALPHABET).toContain(token[2] as typeof COMPACT_SYLLABLE_ALPHABET[number]);
     }
   });
 
   it('rejects non-compact and out-of-alphabet input', () => {
     expect(() => decodeCompactCatToBytes('！！')).toThrowError(/compact/i);
-    expect(() => decodeCompactCatToBytes('abc')).toThrowError(/compact/i);
+    expect(() => decodeCompactCatToBytes('abc')).toThrowError(/token/i);
     expect(() => decodeCompactCatToBytes('喵')).toThrowError(/3 的倍数/i);
-    expect(() => decodeCompactCatToBytes('呼喵喵')).toThrowError(/三连音/i);
+    expect(() => decodeCompactCatToBytes('猫猫猫')).toThrowError(/token/i);
     expect(() => compactDigitToSymbol(COMPACT_BASE)).toThrowError(/digit/i);
   });
 });

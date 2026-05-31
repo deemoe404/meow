@@ -1,5 +1,6 @@
 import {
   compactDigitToSymbol,
+  getCompactEnglishTokenCount,
   getCompactSyllableCount,
   getCompactVocabularySize,
 } from '../protocol/compact-transport';
@@ -370,7 +371,7 @@ export async function createTranslatorApp(
     const summary = document.createElement('p');
     summary.className = 'token-vocabulary-summary';
     summary.dataset.role = 'compact-vocabulary-summary';
-    summary.textContent = `${getCompactSyllableCount()} 个核心猫叫音节组成三连音；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 10 bit，输出不再带格式魔数。`;
+    summary.textContent = `${getCompactVocabularySize()} 个猫语 token：${getCompactSyllableCount()} 个中文猫叫音节三连音 + ${getCompactEnglishTokenCount()} 个英文猫叫（meo/mow/mia/aoo/aou）；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 12 bit，输出不再带格式魔数。`;
 
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) {

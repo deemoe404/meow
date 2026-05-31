@@ -4,7 +4,6 @@ import {
   baseNDigitsToBytesNoPad,
   bytesToBaseNDigitsNoPad,
 } from '../../src/protocol/base-n-digits';
-import { TOKEN_TABLE } from '../../src/protocol/tokens';
 
 describe('base-N digits without padding', () => {
   it('round-trips arbitrary byte lengths', () => {
@@ -24,11 +23,10 @@ describe('base-N digits without padding', () => {
     expect(baseNDigitsToBytesNoPad(digits)).toEqual(bytes);
   });
 
-  it('accepts the highest token table digit during decode', () => {
-    const highestDigit = TOKEN_TABLE.length - 1;
-    const restored = baseNDigitsToBytesNoPad([highestDigit]);
+  it('accepts the highest default-base digit during decode', () => {
+    const restored = baseNDigitsToBytesNoPad([255]);
 
-    expect(restored).toEqual(Uint8Array.from([highestDigit]));
+    expect(restored).toEqual(Uint8Array.from([255]));
   });
 
   it('round-trips with a caller-selected base', () => {
@@ -41,7 +39,7 @@ describe('base-N digits without padding', () => {
   });
 
   it('rejects invalid digits during decode', () => {
-    expect(() => baseNDigitsToBytesNoPad([TOKEN_TABLE.length])).toThrowError(/digit/i);
+    expect(() => baseNDigitsToBytesNoPad([256])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([-1])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([1.5])).toThrowError(/digit/i);
     expect(() => baseNDigitsToBytesNoPad([2048], 2048)).toThrowError(/digit/i);
