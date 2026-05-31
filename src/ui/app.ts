@@ -370,7 +370,7 @@ export async function createTranslatorApp(
     const summary = document.createElement('p');
     summary.className = 'token-vocabulary-summary';
     summary.dataset.role = 'compact-vocabulary-summary';
-    summary.textContent = `${getCompactSyllableCount()} 个猫系音节两两组合；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 10 bit，输出不再带格式魔数。`;
+    summary.textContent = `${getCompactSyllableCount()} 个核心猫叫音节组成三连音；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 10 bit，输出不再带格式魔数。`;
 
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) {

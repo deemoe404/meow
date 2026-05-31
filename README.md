@@ -4,9 +4,9 @@
 
 ## 特性
 
-- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base1024 digit -> 猫系音节对`
+- 任意 Unicode 文本 `-> UTF-8 -> codec frame -> base1024 digit -> 猫叫三连音`
 - `raw` 与 `zstd-dict` 双 codec，编码时自动选择更短 payload
-- 输出使用 32 个猫系音节两两组合成的 1024-token 短码，不再带格式魔数
+- 输出使用 16 个核心猫叫音节组成 1024-token 三连音短码，不再带格式魔数
 - 浏览器本地编解码，无服务端依赖
 - 主线程 UI + Web Worker 协议内核，避免压缩和 wasm 初始化卡住页面
 - 中文主文案、简化版猫系视觉、支持 GitHub Pages 相对路径部署
@@ -44,9 +44,9 @@ pnpm run assets:social
 2. 同时尝试 `raw` 与 `zstd-dict`
 3. 打包为极简 codec frame：首字节是 codec tag，剩余字节全部视为 payload
 4. codec frame 走无 padding 的 base1024 digit 切片
-5. 把每个 digit 映射成两个猫系音节，例如 `喵喵`、`咪嗷`、`呣呼`
+5. 把每个 digit 映射成 3 个核心猫叫音节，例如 `喵喵喵`、`咪咕噜`、`嗷嗚嗚`
 
-这个选择来自信息论约束：压缩后的 payload 近似均匀随机，类似密码学里的密文，高频字节已经基本不存在，因此继续对 payload 做 Huffman 式频率编码收益很小。旧版 256-token 表每个 token 只承载 8 bit，但平均需要约 2.49 个可见字符；新版每个猫语 token 承载 10 bit、占 2 个猫系音节。对 `n` 字节 frame，旧版可见长度约为 `2.49n`，新版长度上界约为 `2 * ceil(8n / 10)`，在保持猫语观感的前提下仍明显更短。
+这个选择来自信息论约束：压缩后的 payload 近似均匀随机，类似密码学里的密文，高频字节已经基本不存在，因此继续对 payload 做 Huffman 式频率编码收益很小。旧版 256-token 表每个 token 只承载 8 bit，但平均需要约 2.49 个可见字符；新版每个猫语 token 承载 10 bit、占 3 个核心猫叫音节。对 `n` 字节 frame，旧版可见长度约为 `2.49n`，新版长度上界约为 `3 * ceil(8n / 10)`，约为 `2.4n`，在恢复猫语声韵的同时仍略短于旧版平均长度。
 
 协议内部的 `CodecId` 与 wire tag 分开表示：UI / meta 中的 codec id 使用 `0 raw`、`1 zstd-dict`；写入 codec frame 首字节的 wire tag 固定为：
 

@@ -155,7 +155,7 @@ describe('translator app', () => {
     expect(dialog!.getAttribute('aria-modal')).toBe('true');
     expect(dialog!.textContent).toContain(`当前猫语短码 / ${getCompactVocabularySize()} tokens`);
     expect(summary).not.toBeNull();
-    expect(summary!.textContent).toContain(`${getCompactSyllableCount()} 个猫系音节两两组合`);
+    expect(summary!.textContent).toContain(`${getCompactSyllableCount()} 个核心猫叫音节组成三连音`);
     expect(summary!.textContent).toContain(`示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}`);
     expect(summary!.textContent).toContain('每个 token 承载 10 bit');
     expect(summary!.textContent).toContain('输出不再带格式魔数');
