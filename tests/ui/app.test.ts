@@ -2,7 +2,10 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { TOKEN_TABLE } from '../../src/protocol/tokens';
+import {
+  compactDigitToSymbol,
+  getCompactVocabularySize,
+} from '../../src/protocol/compact-transport';
 import { createTranslatorApp } from '../../src/ui/app';
 import type { AppService } from '../../src/ui/app';
 
@@ -113,7 +116,7 @@ describe('translator app', () => {
     expect(root.textContent).not.toContain('PURRFECT MATCH');
     expect(root.textContent).toContain('codec');
     expect(root.textContent).not.toContain('rawLength');
-    expect(root.textContent).toContain('tokenCount');
+    expect(root.textContent).toContain('symbolCount');
     expect(root.querySelector('[data-role="expanded-vocabulary-toggle"]')).toBeNull();
 
     const repoLink = root.querySelector<HTMLAnchorElement>('[data-role="github-repo-link"]');
@@ -135,38 +138,25 @@ describe('translator app', () => {
     const trigger = root.querySelector<HTMLButtonElement>('[data-role="token-vocabulary-trigger"]');
 
     expect(trigger).not.toBeNull();
-    expect(trigger!.textContent).toContain('词表');
-    expect(trigger!.textContent).toContain(String(TOKEN_TABLE.length));
+    expect(trigger!.textContent).toContain('短码');
+    expect(trigger!.textContent).toContain(String(getCompactVocabularySize()));
     expect(root.textContent).not.toContain('占用');
     expect(root.querySelector('[data-role="token-vocabulary-dialog"]')).toBeNull();
 
     trigger!.click();
 
     const dialog = root.querySelector<HTMLElement>('[data-role="token-vocabulary-dialog"]');
-    const items = root.querySelectorAll('[data-role="token-list-item"]');
-    const firstItem = root.querySelector<HTMLElement>('[data-token-index="0"]');
-    const spaceIndex = TOKEN_TABLE.indexOf(' ');
-    const suffixSpaceIndex = TOKEN_TABLE.indexOf('！ ');
-    const newlineIndex = TOKEN_TABLE.indexOf('\n');
-    const suffixSpaceItem = root.querySelector<HTMLElement>(`[data-token-index="${suffixSpaceIndex}"]`);
-    const newlineItem = root.querySelector<HTMLElement>(`[data-token-index="${newlineIndex}"]`);
-    const lastItem = root.querySelector<HTMLElement>(`[data-token-index="${TOKEN_TABLE.length - 1}"]`);
+    const summary = root.querySelector<HTMLElement>('[data-role="compact-vocabulary-summary"]');
 
     expect(trigger!.getAttribute('aria-expanded')).toBe('true');
     expect(dialog).not.toBeNull();
     expect(dialog!.getAttribute('role')).toBe('dialog');
     expect(dialog!.getAttribute('aria-modal')).toBe('true');
-    expect(dialog!.textContent).toContain(`当前词表 / ${TOKEN_TABLE.length} tokens`);
-    expect(items).toHaveLength(TOKEN_TABLE.length);
-    expect(spaceIndex).toBe(-1);
-    expect(firstItem?.textContent).toContain('0');
-    expect(firstItem?.textContent).toContain(TOKEN_TABLE[0]);
-    expect(suffixSpaceItem?.textContent).toContain(String(suffixSpaceIndex));
-    expect(suffixSpaceItem?.textContent).toContain('！ + 空格');
-    expect(newlineItem?.textContent).toContain(String(newlineIndex));
-    expect(newlineItem?.textContent).toContain('换行 ("\\n")');
-    expect(lastItem?.textContent).toContain(String(TOKEN_TABLE.length - 1));
-    expect(lastItem?.textContent).toContain('嗷喵 + 空格');
+    expect(dialog!.textContent).toContain(`当前短码 / ${getCompactVocabularySize()} symbols`);
+    expect(summary).not.toBeNull();
+    expect(summary!.textContent).toContain(`短码范围 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}`);
+    expect(summary!.textContent).toContain('输出不再带格式魔数');
+    expect(root.querySelectorAll('[data-role="token-list-item"]')).toHaveLength(0);
   });
 
   it('animates the token vocabulary dialog closed before removing it and restoring focus', async () => {

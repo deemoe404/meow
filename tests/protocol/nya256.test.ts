@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  getCompactCatDigitCount,
+} from '../../src/protocol/compact-transport';
 import { createNya256Codec } from '../../src/protocol/nya256';
-import { decodeCatToDigits } from '../../src/protocol/tokens';
 import type { CompressionAdapter } from '../../src/protocol/types';
 
 function createCompressionAdapter(): CompressionAdapter {
@@ -66,8 +68,8 @@ describe('nya256 codec', () => {
     const decoded = await codec.decode(encoded.cat);
 
     expect(decoded.text).toBe(text);
-    expect(encoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat).length);
-    expect(decoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat).length);
+    expect(encoded.meta.tokenCount).toBe(getCompactCatDigitCount(encoded.cat));
+    expect(decoded.meta.tokenCount).toBe(getCompactCatDigitCount(encoded.cat));
     expect(encoded.meta).not.toHaveProperty('vocabulary');
     expect(decoded.meta).not.toHaveProperty('vocabulary');
   });
@@ -86,7 +88,7 @@ describe('nya256 codec', () => {
     expect(encoded.meta.codec).toBe(0);
   });
 
-  it('uses a one-byte codec frame for short raw text', async () => {
+  it('uses compact transport for short raw text', async () => {
     const codec = createNya256Codec(createRawCompressionAdapter());
     const encoded = await codec.encode('你好');
     const decoded = await codec.decode(encoded.cat);
@@ -94,10 +96,10 @@ describe('nya256 codec', () => {
     expect(decoded.text).toBe('你好');
     expect(encoded.meta.codec).toBe(0);
     expect(encoded.meta).not.toHaveProperty('rawLength');
-    expect(encoded.meta.tokenCount).toBe(decodeCatToDigits(encoded.cat).length);
+    expect(encoded.meta.tokenCount).toBe(getCompactCatDigitCount(encoded.cat));
   });
 
-  it('reports token counts from base256 digits for fixed raw samples', async () => {
+  it('reports symbol counts from compact digits for fixed raw samples', async () => {
     const codec = createNya256Codec(createRawCompressionAdapter());
     const shortText = 'short';
     const longText = '在一个理想的猫语翻译器里，协议层和外观层必须明确分开。协议层负责把任意 Unicode 文本安全地转成 UTF-8 字节，再经过 raw 或 zstd-dict 选择、frame 打包、base256 digit 切片和固定 token 表映射，最后得到一串可以公开传播的猫语。';
@@ -107,8 +109,7 @@ describe('nya256 codec', () => {
 
     expect(await codec.decode(shortEncoded.cat)).toMatchObject({ text: shortText });
     expect(await codec.decode(longEncoded.cat)).toMatchObject({ text: longText });
-    expect(shortEncoded.meta.tokenCount).toBe(decodeCatToDigits(shortEncoded.cat).length);
-    expect(longEncoded.meta.tokenCount).toBe(decodeCatToDigits(longEncoded.cat).length);
+    expect(shortEncoded.meta.tokenCount).toBe(getCompactCatDigitCount(shortEncoded.cat));
+    expect(longEncoded.meta.tokenCount).toBe(getCompactCatDigitCount(longEncoded.cat));
   });
-
 });

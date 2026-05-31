@@ -1,13 +1,9 @@
 import {
-  baseNDigitsToBytesNoPad,
-  bytesToBaseNDigitsNoPad,
-} from './base-n-digits';
+  decodeCompactCatToBytes,
+  encodeBytesToCompactCat,
+  getCompactCatDigitCount,
+} from './compact-transport';
 import { packFrame, unpackFrame } from './frame';
-import {
-  decodeCatToDigits,
-  encodeDigitsToCat,
-  getVocabularySize,
-} from './tokens';
 import type {
   CompressionAdapter,
   DecodeResult,
@@ -47,13 +43,13 @@ export function createNya256Codec(adapter: CompressionAdapter) {
       codec: choice.codec,
       payload: choice.payload,
     });
-    const digits = bytesToBaseNDigitsNoPad(frame, getVocabularySize());
+    const cat = encodeBytesToCompactCat(frame);
 
     return {
-      cat: encodeDigitsToCat(digits),
+      cat,
       meta: buildMeta(
         choice.codec,
-        digits.length,
+        getCompactCatDigitCount(cat),
       ),
     };
   }
@@ -61,8 +57,7 @@ export function createNya256Codec(adapter: CompressionAdapter) {
   async function decode(cat: string): Promise<DecodeResult> {
     await ensureReady();
 
-    const digits = decodeCatToDigits(cat);
-    const frameBytes = baseNDigitsToBytesNoPad(digits, getVocabularySize());
+    const frameBytes = decodeCompactCatToBytes(cat);
     const frame = unpackFrame(frameBytes);
     const raw = await adapter.decodePayload(frame.codec, frame.payload);
 
@@ -70,7 +65,7 @@ export function createNya256Codec(adapter: CompressionAdapter) {
       text: textDecoder.decode(raw),
       meta: buildMeta(
         frame.codec,
-        digits.length,
+        getCompactCatDigitCount(cat),
       ),
     };
   }

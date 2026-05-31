@@ -307,6 +307,14 @@ textarea:focus-visible {
   transform: translateY(-1px);
 }
 
+.token-vocabulary-summary {
+  margin: 0;
+  padding: 14px 26px 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .token-vocabulary-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

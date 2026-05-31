@@ -1,7 +1,7 @@
 import {
-  getTokenTable,
-  getVocabularySize,
-} from '../protocol/tokens';
+  compactDigitToSymbol,
+  getCompactVocabularySize,
+} from '../protocol/compact-transport';
 import type { EncodeResult, DecodeResult } from '../protocol/types';
 import type { WorkerReadyResult } from '../worker/messages';
 
@@ -31,22 +31,6 @@ function codecName(codec: number): string {
 function buttonPressed(button: HTMLButtonElement, active: boolean): void {
   button.setAttribute('aria-pressed', active ? 'true' : 'false');
   button.classList.toggle('is-active', active);
-}
-
-function tokenDisplayValue(token: string): string {
-  if (token === ' ') {
-    return '空格 (" ")';
-  }
-
-  if (token === '\n') {
-    return '换行 ("\\n")';
-  }
-
-  if (token.endsWith(' ')) {
-    return `${tokenDisplayValue(token.slice(0, -1))} + 空格`;
-  }
-
-  return token;
 }
 
 type IconName = 'paw' | 'east' | 'sync' | 'copy' | 'star' | 'share' | 'github';
@@ -127,10 +111,10 @@ export async function createTranslatorApp(
           data-role="token-vocabulary-trigger"
           aria-haspopup="dialog"
           aria-expanded="false"
-          aria-label="查看当前词表，共 ${getVocabularySize()} 个 token"
+          aria-label="查看当前短码，共 ${getCompactVocabularySize()} 个 symbol"
         >
-          <span>词表</span>
-          <strong data-role="token-vocabulary-count">${getVocabularySize()}</strong>
+          <span>短码</span>
+          <strong data-role="token-vocabulary-count">${getCompactVocabularySize()}</strong>
         </button>
       </div>
 
@@ -206,7 +190,7 @@ export async function createTranslatorApp(
           <div class="meta-row" aria-live="polite">
             <span class="runtime-status" data-role="status">初始化中</span>
             <span>codec <strong data-role="meta-codec">-</strong></span>
-            <span>tokenCount <strong data-role="meta-token-count">-</strong></span>
+            <span>symbolCount <strong data-role="meta-token-count">-</strong></span>
           </div>
           <div class="sr-only">
             <button type="button" data-role="sample">示例</button>
@@ -354,7 +338,6 @@ export async function createTranslatorApp(
   };
 
   const buildTokenVocabularyDialog = () => {
-    const tokenTable = getTokenTable();
     const overlay = document.createElement('div');
     overlay.className = 'token-vocabulary-overlay';
     overlay.dataset.role = 'token-vocabulary-overlay';
@@ -371,41 +354,22 @@ export async function createTranslatorApp(
 
     const title = document.createElement('h2');
     title.id = 'token-vocabulary-title';
-    title.textContent = `当前词表 / ${tokenTable.length} tokens`;
+    title.textContent = `当前短码 / ${getCompactVocabularySize()} symbols`;
 
     const close = document.createElement('button');
     close.className = 'token-vocabulary-close';
     close.type = 'button';
     close.dataset.role = 'token-vocabulary-close';
-    close.setAttribute('aria-label', '关闭词表');
+    close.setAttribute('aria-label', '关闭码表');
     close.textContent = '关闭';
     close.addEventListener('click', () => closeTokenVocabularyDialog());
 
     header.append(title, close);
 
-    const list = document.createElement('div');
-    list.className = 'token-vocabulary-list';
-    list.dataset.role = 'token-vocabulary-list';
-    list.setAttribute('role', 'list');
-
-    tokenTable.forEach((token, index) => {
-      const item = document.createElement('div');
-      item.className = 'token-vocabulary-item';
-      item.dataset.role = 'token-list-item';
-      item.dataset.tokenIndex = String(index);
-      item.setAttribute('role', 'listitem');
-
-      const indexLabel = document.createElement('span');
-      indexLabel.className = 'token-vocabulary-index';
-      indexLabel.textContent = String(index);
-
-      const value = document.createElement('span');
-      value.className = 'token-vocabulary-value';
-      value.textContent = tokenDisplayValue(token);
-
-      item.append(indexLabel, value);
-      list.append(item);
-    });
+    const summary = document.createElement('p');
+    summary.className = 'token-vocabulary-summary';
+    summary.dataset.role = 'compact-vocabulary-summary';
+    summary.textContent = `短码范围 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}；每个 symbol 承载 14 bit，输出不再带格式魔数。`;
 
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) {
@@ -413,7 +377,7 @@ export async function createTranslatorApp(
       }
     });
 
-    dialog.append(header, list);
+    dialog.append(header, summary);
     overlay.append(dialog);
 
     return {
@@ -643,9 +607,9 @@ export async function createTranslatorApp(
   };
 
   const renderVocabularyControls = () => {
-    const count = getVocabularySize();
+    const count = getCompactVocabularySize();
 
-    tokenVocabularyTrigger.setAttribute('aria-label', `查看当前词表，共 ${count} 个 token`);
+    tokenVocabularyTrigger.setAttribute('aria-label', `查看当前短码，共 ${count} 个 symbol`);
     tokenVocabularyCount.textContent = String(count);
   };
 

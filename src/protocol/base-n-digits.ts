@@ -1,7 +1,6 @@
 import { ProtocolError } from './errors';
-import { TOKEN_TABLE } from './tokens';
 
-const DEFAULT_BASE: number = TOKEN_TABLE.length;
+const DEFAULT_BASE = 256;
 
 function ensureBase(base: number): void {
   if (!Number.isInteger(base) || base < 2) {
