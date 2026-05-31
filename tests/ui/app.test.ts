@@ -4,8 +4,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   compactDigitToSymbol,
+  getCompactAverageTokenWidth,
   getCompactEnglishTokenCount,
-  getCompactSyllableCount,
+  getCompactLongChineseTokenCount,
+  getCompactShortTokenCount,
   getCompactVocabularySize,
 } from '../../src/protocol/compact-transport';
 import { createTranslatorApp } from '../../src/ui/app';
@@ -157,11 +159,13 @@ describe('translator app', () => {
     expect(dialog!.textContent).toContain(`当前猫语短码 / ${getCompactVocabularySize()} tokens`);
     expect(summary).not.toBeNull();
     expect(summary!.textContent).toContain(`${getCompactVocabularySize()} 个猫语 token`);
-    expect(summary!.textContent).toContain(`${getCompactSyllableCount()} 个中文猫叫音节三连音`);
+    expect(summary!.textContent).toContain(`${getCompactShortTokenCount()} 个双字猫叫`);
+    expect(summary!.textContent).toContain(`${getCompactLongChineseTokenCount()} 个中文猫叫三连音`);
     expect(summary!.textContent).toContain(`${getCompactEnglishTokenCount()} 个英文猫叫`);
     expect(summary!.textContent).toContain('meo/mow/mia/aoo/aou');
     expect(summary!.textContent).toContain(`示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}`);
     expect(summary!.textContent).toContain('每个 token 承载 12 bit');
+    expect(summary!.textContent).toContain(`平均 ${getCompactAverageTokenWidth()} 字`);
     expect(summary!.textContent).toContain('输出不再带格式魔数');
     expect(root.querySelectorAll('[data-role="token-list-item"]')).toHaveLength(0);
   });

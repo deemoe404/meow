@@ -1,7 +1,9 @@
 import {
   compactDigitToSymbol,
+  getCompactAverageTokenWidth,
   getCompactEnglishTokenCount,
-  getCompactSyllableCount,
+  getCompactLongChineseTokenCount,
+  getCompactShortTokenCount,
   getCompactVocabularySize,
 } from '../protocol/compact-transport';
 import type { EncodeResult, DecodeResult } from '../protocol/types';
@@ -371,7 +373,7 @@ export async function createTranslatorApp(
     const summary = document.createElement('p');
     summary.className = 'token-vocabulary-summary';
     summary.dataset.role = 'compact-vocabulary-summary';
-    summary.textContent = `${getCompactVocabularySize()} 个猫语 token：${getCompactSyllableCount()} 个中文猫叫音节三连音 + ${getCompactEnglishTokenCount()} 个英文猫叫（meo/mow/mia/aoo/aou）；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 12 bit，输出不再带格式魔数。`;
+    summary.textContent = `${getCompactVocabularySize()} 个猫语 token：${getCompactShortTokenCount()} 个双字猫叫 + ${getCompactLongChineseTokenCount()} 个中文猫叫三连音 + ${getCompactEnglishTokenCount()} 个英文猫叫（meo/mow/mia/aoo/aou）；示例 ${compactDigitToSymbol(0)}..${compactDigitToSymbol(getCompactVocabularySize() - 1)}，每个 token 承载 12 bit，平均 ${getCompactAverageTokenWidth()} 字，输出不再带格式魔数。`;
 
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) {
